@@ -14,10 +14,23 @@ Build:
   script:
     - mvn $MAVEN_CLI_OPTS compile
 
-Input2Output:
+In2OutRunnable:
   stage: test
   script:
     - mvn -Dtest=echo.runnable.Input2OutputTest test
+
+EchoActor:
+  stage: test
+  script:
+    - mvn -Dtest=echo.actor.EchoActorTest test
+
+In2OutActor:
+  stage: test
+  script:
+    - mvn -Dtest=echo.actor.Input2OutputTest test
+
+
+
 
 deploy-prod:
   stage: deploy
