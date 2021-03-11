@@ -34,6 +34,10 @@ Greeter:
   script:
     - mvn -Dtest=greeter.actor.GreeterTest test
 
+ChatRoom:
+  stage: test
+  script:
+    - mvn -Dtest=chat.actor.ChatRoomTest test
 
 
 deploy-prod:
