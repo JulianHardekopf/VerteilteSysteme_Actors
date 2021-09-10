@@ -7,4 +7,4 @@ Alle Packages unter diesem Verzeichnis sind Application Sources.
 Alle Packages unter diesem Verzeichnis sind Test Sources.
 
 
-Sie können bei Bedarf weitere Blätter an die Paketbäume hängen.
+Sie können bei Bedarf weitere Blätter an die Paketbäume hängen!
