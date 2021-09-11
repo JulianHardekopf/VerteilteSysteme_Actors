@@ -7,5 +7,5 @@ ActorContext
 MessageProcessor
 Writer
 Reader
-AskWithOutput
+AskWithStream
 ActorSystem

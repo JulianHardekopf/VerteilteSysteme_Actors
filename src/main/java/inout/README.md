@@ -12,5 +12,6 @@ ConsoleWriter
 ScriptReader
 ScriptWriter
 FileReader
-UDPSocket
-TCPSocket
+TCPReader
+TCPWriter
+TCPReaderWriter
