@@ -1,139 +1,104 @@
 package fpinjava;
 
+import io.IO;
+
 import java.io.Serializable;
 import java.util.Objects;
+//import java.util.concurrent.Callable;
 
-public abstract class Result<T> implements Serializable {
+import static io.IO.unit;
+import tuple.Tuple;
 
-  @SuppressWarnings("rawtypes")
-  private static Result empty = new Empty();
+public abstract class Result<A> implements Serializable {
 
   private Result() {
   }
 
-  public abstract T getOrElse(final T defaultValue);
+  public abstract <B> IO<Result<B>> mapIO(Function<A, IO<B>> f);
+  public abstract <B> IO<Result<B>> flatMapIO(Function<A,  IO<Result<B>>> f);
 
-  public abstract T getOrElse(final Supplier<T> defaultValue);
+  public abstract Boolean isSuccess();
+  public abstract Boolean isFailure();
+  public abstract Boolean isEmpty();
+  public abstract A getOrElse(final A defaultValue);
+  public abstract A getOrElse(final Supplier<A> defaultValue);
+  public abstract <B> B foldl(Function<B, Function<A, B>> f, final B identity);
+  public abstract <B> B foldr(Function<A, Function<B, B>> f, final B identity);
+  public abstract A successValue();
+  public abstract Exception failureValue();
+  public abstract void forEach(Effect<A> c);
+  public abstract void forEachOrThrow(Effect<A> c);
+  public abstract Result<String> forEachOrFail(Effect<A> e);
+  public abstract Result<RuntimeException> forEachOrException(Effect<A> e);
+  public abstract Result<A> filter(Function<A, Boolean> f);
+  public abstract Result<A> filter(Function<A, Boolean> p, String message);
+  public abstract <B> Result<B> map(Function<A, B> f);
+  public abstract Result<A> mapFailure(String s, Exception e);
+  public abstract Result<A> mapFailure(String s);
+  public abstract Result<A> mapFailure(Exception e);
+  public abstract Result<A> mapFailure(Result<A> v);
+  public abstract Result<Nothing> mapEmpty();
+  public abstract <B> Result<B> flatMap(Function<A, Result<B>> f);
+  public abstract Boolean exists(Function<A, Boolean> f);
+  public abstract IO<Nothing> tryIO(Function<A, IO<Nothing>> success, Function<String, IO<Nothing>> failure);
 
-  public abstract <U> Result<U> map(Function<T, U> f);
 
-  public abstract <U> Result<U> flatMap(Function<T, Result<U>> f);
+  // ap(Nothing, _ )          = Nothing
+  // ap((Just f), this ) = map f this
+  public <B> Result<B> ap(Result<Function<A, B>> rf) {
+    if (rf.isSuccess()) {
+      return map(rf.successValue());
+    } else return empty();
+  }
 
-  public abstract Result<T> mapFailure(String s);
+  public <B> Result<B> pure(B b){
+    return success(b);
+  }
 
-  public abstract Result<T> mapFailure(String s, Exception e);
+  public <B> Result<B> bind(Function<A, Result<B>> f) {
+    return flatMap(f);
+  }
 
-  public abstract Result<T> mapFailure(Exception e);
-
-  public abstract Result<T> failIfEmpty(String message);
-
-  public abstract void forEach(Effect<T> ef);
-
-  public abstract void forEachOrThrow(Effect<T> ef);
-
-  public abstract Result<RuntimeException> forEachOrException(Effect<T> ef);
-
-  public Result<T> orElse(Supplier<Result<T>> defaultValue) {
+  public Result<A> orElse(Supplier<Result<A>> defaultValue) {
     return map(x -> this).getOrElse(defaultValue);
   }
 
-  public Result<T> filter(Function<T, Boolean> p) {
-    return flatMap(x -> p.apply(x)
-        ? this
-        : failure("Condition not matched"));
+  public static <A> IO<Result<A>> foldlIO(Result<IO<A>> r) {
+    IO<Result<A>> z = IO.unit(Result.empty());
+    Function<IO<Result<A>>, Function<IO<A>, IO<Result<A>>>> f = iors -> ios -> iors.flatMap(rs -> ios.flatMap(s -> IO.unit(Result.of(s))));
+    return r.foldl(f, z);
   }
 
-  public Result<T> filter(Function<T, Boolean> p, String message) {
-    return flatMap(x -> p.apply(x)
-        ? this
-        : failure(message));
+  public static <T, U> Result<T> failure(Failure<U> failure) {
+    return new Failure<>(failure.exception);
   }
 
-  public boolean exists(Function<T, Boolean> p) {
-    return map(p).getOrElse(false);
+  public static <A> Result<A> failure(String message) {
+    return new Failure<>(message);
   }
 
-  private static class Empty<T> extends Result<T> {
-
-    public Empty() {
-      super();
-    }
-
-    @Override
-    public T getOrElse(final T defaultValue) {
-      return defaultValue;
-    }
-
-    @Override
-    public <U> Result<U> map(Function<T, U> f) {
-      return empty();
-    }
-
-    @Override
-    public <U> Result<U> flatMap(Function<T, Result<U>> f) {
-      return empty();
-    }
-
-    @Override
-    public Result<T> mapFailure(String s) {
-      return this;
-    }
-
-    @Override
-    public Result<T> mapFailure(String s, Exception e) {
-      return this;
-    }
-
-    @Override
-    public Result<T> mapFailure(Exception e) {
-      return this;
-    }
-
-    @Override
-    public Result<T> failIfEmpty(String message) {
-      return failure(message);
-    }
-
-    @Override
-    public void forEach(Effect<T> ef) {
-      // Do nothing
-    }
-
-    @Override
-    public void forEachOrThrow(Effect<T> ef) {
-      // Do nothing
-    }
-
-    @Override
-    public Result<RuntimeException> forEachOrException(Effect<T> ef) {
-      return empty();
-    }
-
-    @Override
-    public String toString() {
-      return "Empty()";
-    }
-
-    @Override
-    public T getOrElse(Supplier<T> defaultValue) {
-      return defaultValue.get();
-    }
-
-    /**
-     * There is only one instance of Empty, so all Empty are equals.
-     */
-    @Override
-    public boolean equals(Object o) {
-      return this == o;
-    }
-
-    @Override
-    public int hashCode() {
-      return 0;
-    }
+  public static <A> Result<A> failure(String message, Exception e) {
+    return new Failure<>(new IllegalStateException(message, e));
   }
 
-  private static class Failure<T> extends Empty<T> {
+  public static <A> Result<A> failure(Exception e) {
+    return new Failure<>(e);
+  }
+
+  public static <A> Result<A> success(A value) {
+    return new Success<>(value);
+  }
+
+  public static <A> Result<A> empty() {
+    return new Empty<>();
+  }
+
+  public static <A> Result<A> flatten(Result<Result<A>> result) {
+    return result.flatMap(x -> x);
+  }
+
+
+  private static class Failure<A> extends Empty<A> {
 
     private final RuntimeException exception;
 
@@ -149,227 +114,545 @@ public abstract class Result<T> implements Serializable {
 
     private Failure(Exception e) {
       super();
-      this.exception = new IllegalStateException(e.getMessage(), e);
+      this.exception = new IllegalStateException(e);
     }
 
     @Override
-    public String toString() {
-      return String.format("Failure(%s)", exception.getMessage());
+    public Boolean isSuccess() {
+      return false;
     }
 
     @Override
-    public <U> Result<U> map(Function<T, U> f) {
-      return failure(exception);
+    public Boolean isFailure() {
+      return true;
     }
 
     @Override
-    public <U> Result<U> flatMap(Function<T, Result<U>> f) {
-      return failure(exception);
+    public A getOrElse(final A defaultValue) {
+      return defaultValue;
     }
 
     @Override
-    public Result<T> mapFailure(String s) {
-        return failure(new IllegalStateException(s, exception));
+    public A successValue() {
+      throw new IllegalStateException("Method successValue() called on a Failure instance");
     }
 
     @Override
-    public Result<T> mapFailure(String s, Exception e) {
-      return failure(new IllegalStateException(s, e));
+    public RuntimeException failureValue() {
+      return this.exception;
     }
 
     @Override
-    public Result<T> mapFailure(Exception e) {
-      return failure(e);
-    }
-
-    @Override
-    public Result<T> failIfEmpty(String message) {
-      return failure(message);
-    }
-
-    @Override
-    public void forEachOrThrow(Effect<T> ef) {
+    public void forEachOrThrow(Effect<A> c) {
       throw exception;
     }
 
     @Override
-    public Result<RuntimeException> forEachOrException(Effect<T> ef) {
+    public Result<RuntimeException> forEachOrException(Effect<A> c) {
       return success(exception);
     }
 
-    /**
-     * Failures are equals only if they are the same object.
-     */
     @Override
-    public boolean equals(Object o) {
-      return this == o;
+    public Result<String> forEachOrFail(Effect<A> c) {
+      return success(exception.getMessage());
     }
 
-    /**
-     * We need a better hashCode method returning a different hashCode for
-     * all failures. See http://code.google.com/p/smhasher and:or the Guava
-     * Hashing class for examples.
-     */
     @Override
-    public int hashCode() {
-      return this.exception.hashCode();
+    public Result<A> filter(Function<A, Boolean> f) {
+      return failure(this);
     }
+
+    @Override
+    public Result<A> filter(Function<A, Boolean> p, String message) {
+      return failure(this);
+    }
+
+    @Override
+    public <U> Result<U> map(Function<A, U> f) {
+      return failure(this);
+    }
+
+    @Override
+    public Result<A> mapFailure(String s, Exception e) {
+      return failure(s, e);
+    }
+
+    @Override
+    public Result<A> mapFailure(String s) {
+      return failure(s, exception);
+    }
+
+    @Override
+    public Result<A> mapFailure(Exception e) {
+      return failure(e.getMessage(), e);
+    }
+
+    @Override
+    public Result<A> mapFailure(Result<A> v) {
+      return v;
+    }
+
+    @Override
+    public Result<Nothing> mapEmpty() {
+      return failure(this);
+    }
+
+    @Override
+    public <U> Result<U> flatMap(Function<A, Result<U>> f) {
+      return failure(exception.getMessage(), exception);
+    }
+
+
+    @Override
+    public String toString() {
+      return String.format("Failure(%s)", failureValue());
+    }
+
+    @Override
+    public Boolean exists(Function<A, Boolean> f) {
+      return false;
+    }
+
+    @Override
+    public A getOrElse(Supplier<A> defaultValue) {
+      return defaultValue.get();
+    }
+
+    @Override
+    public IO<Nothing> tryIO(Function<A, IO<Nothing>> success, Function<String, IO<Nothing>> failure) {
+      return failure.apply(exception.getMessage());
+    }
+
+    public <U> IO<Result<U>> mapIO(Function<A, IO<U>> f) {
+      return IO.unit(failure(this));
+    }
+    
+    @Override
+    public boolean equals(Object o){
+    	return (this == o || o instanceof Failure);
+    }
+    
+    @Override
+    public int hashCode(){
+    	return 0;
+    }
+
   }
 
-  private static class Success<T> extends Result<T> {
+  private static class Empty<A> extends Result<A> {
 
-    private final T value;
+    public Empty() {
+      super();
+    }
 
-    private Success(T value) {
+    @Override
+    public <B> IO<Result<B>> flatMapIO(Function<A, IO<Result<B>>> f) {
+      return null;
+    }
+
+    @Override
+    public Boolean isSuccess() {
+      return false;
+    }
+
+    @Override
+    public Boolean isFailure() {
+      return false;
+    }
+
+    @Override
+    public Boolean isEmpty() {
+      return true;
+    }
+
+    @Override
+    public A getOrElse(final A defaultValue) {
+      return defaultValue;
+    }
+
+    @Override
+    public A successValue() {
+      throw new IllegalStateException("Method successValue() called on a Empty instance");
+    }
+
+    @Override
+    public RuntimeException failureValue() {
+      throw new IllegalStateException("Method failureMessage() called on a Empty instance");
+    }
+
+    @Override
+    public void forEach(Effect<A> c) {
+      /* Empty. Do nothing. */
+    }
+
+    @Override
+    public void forEachOrThrow(Effect<A> c) {
+      /* Do nothing */
+    }
+
+    @Override
+    public Result<String> forEachOrFail(Effect<A> c) {
+      return empty();
+    }
+
+    @Override
+    public Result<RuntimeException> forEachOrException(Effect<A> c) {
+      return empty();
+    }
+
+    @Override
+    public Result<A> filter(Function<A, Boolean> f) {
+      return empty();
+    }
+
+    @Override
+    public Result<A> filter(Function<A, Boolean> p, String message) {
+      return empty();
+    }
+
+    @Override
+    public <U> Result<U> map(Function<A, U> f) {
+      return empty();
+    }
+
+    @Override
+    public Result<A> mapFailure(String s, Exception e) {
+      return failure(s, e);
+    }
+
+    @Override
+    public Result<A> mapFailure(String s) {
+      return failure(s);
+    }
+
+    @Override
+    public Result<A> mapFailure(Exception e) {
+      return failure(e.getMessage(), e);
+    }
+
+    @Override
+    public Result<A> mapFailure(Result<A> v) {
+      return v;
+    }
+
+    @Override
+    public Result<Nothing> mapEmpty() {
+      return success(Nothing.instance);
+    }
+
+    @Override
+    public <B> Result<B> flatMap(Function<A, Result<B>> f) {
+      return empty();
+    }
+
+    @Override
+    public String toString() {
+      return "Empty()";
+    }
+
+    @Override
+    public Boolean exists(Function<A, Boolean> f) {
+      return false;
+    }
+
+    @Override
+    public A getOrElse(Supplier<A> defaultValue) {
+      return defaultValue.get();
+    }
+
+    @Override
+    public <B> B foldl(Function<B, Function<A, B>> f, B identity) {
+      return identity;
+    }
+
+    @Override
+    public <B> B foldr(Function<A, Function<B, B>> f, B identity) {
+      return identity;
+    }
+
+    @Override
+    public IO<Nothing> tryIO(Function<A, IO<Nothing>> success, Function<String, IO<Nothing>> failure) {
+      return failure.apply("Empty Result");
+    }
+
+    public <B> IO<Result<B>> mapIO(Function<A, IO<B>> f) {
+      return IO.unit(Result.empty());
+    }
+    
+    @Override
+    public boolean equals(Object o){
+    	return (this == o || o instanceof Empty);
+    }
+    
+    @Override
+    public int hashCode(){
+    	return 0;
+    }
+
+  }
+
+  private static class Success<A> extends Result<A> {
+
+    private final A value;
+
+    public Success(A value) {
       super();
       this.value = value;
     }
 
     @Override
-    public String toString() {
-      return String.format("Success(%s)", value.toString());
+    public <B> IO<Result<B>> flatMapIO(Function<A, IO<Result<B>>> f) {
+      return null;
     }
 
     @Override
-    public T getOrElse(T defaultValue) {
-      return value;
+    public Boolean isSuccess() {
+      return true;
     }
 
     @Override
-    public T getOrElse(Supplier<T> defaultValue) {
-      return value;
+    public Boolean isFailure() {
+      return false;
     }
 
     @Override
-    public <U> Result<U> map(Function<T, U> f) {
-      return success(f.apply(value));
+    public Boolean isEmpty() {
+      return false;
     }
 
     @Override
-    public <U> Result<U> flatMap(Function<T, Result<U>> f) {
-      return f.apply(value);
+    public A getOrElse(final A defaultValue) {
+      return successValue();
     }
 
     @Override
-    public Result<T> mapFailure(String s) {
-      return this;
+    public A successValue() {
+      return this.value;
     }
 
     @Override
-    public Result<T> mapFailure(String s, Exception e) {
-      return this;
+    public RuntimeException failureValue() {
+      throw new IllegalStateException("Method failureValue() called on a Success instance");
     }
 
     @Override
-    public Result<T> mapFailure(Exception e) {
-      return this;
+    public void forEach(Effect<A> e) {
+      e.apply(this.value);
     }
 
     @Override
-    public Result<T> failIfEmpty(String message) {
-      return this;
+    public void forEachOrThrow(Effect<A> e) {
+      e.apply(this.value);
     }
 
     @Override
-    public void forEach(Effect<T> ef) {
-      ef.apply(value);
-    }
-
-    @Override
-    public void forEachOrThrow(Effect<T> ef) {
-      ef.apply(value);
-    }
-
-    @Override
-    public Result<RuntimeException> forEachOrException(Effect<T> ef) {
-      ef.apply(value);
+    public Result<String> forEachOrFail(Effect<A> e) {
+      e.apply(this.value);
       return empty();
     }
 
     @Override
-    public boolean equals(Object o) {
-      return (this == o || o instanceof Success)
-          && this.value.equals(((Success<?>) o).value);
+    public Result<RuntimeException> forEachOrException(Effect<A> e) {
+      e.apply(this.value);
+      return empty();
     }
 
     @Override
+    public Result<A> filter(Function<A, Boolean> p) {
+      return filter(p, "Unmatched predicate with no error message provided.");
+    }
+
+    @Override
+    public Result<A> filter(Function<A, Boolean> p, String message) {
+      try {
+        return p.apply(successValue())
+            ? this
+            : failure(message);
+      } catch (Exception e) {
+        return failure(e.getMessage(), e);
+      }
+    }
+
+    // fmap f (Just x) = Just (f x)
+    @Override
+    public <U> Result<U> map(Function<A, U> f) {
+      try {
+        return success(f.apply(successValue()));
+      } catch (Exception e) {
+        return failure(e.getMessage(), e);
+      }
+    }
+
+    @Override
+    public Result<A> mapFailure(String f, Exception e) {
+      return this;
+    }
+
+    @Override
+    public Result<A> mapFailure(String s) {
+      return this;
+    }
+
+    @Override
+    public Result<A> mapFailure(Exception e) {
+      return this;
+    }
+
+    @Override
+    public Result<A> mapFailure(Result<A> v) {
+      return this;
+    }
+
+    @Override
+    public Result<Nothing> mapEmpty() {
+      return failure("Not empty");
+    }
+
+    @Override
+    public <B> Result<B> flatMap(Function<A, Result<B>> f) {
+      try {
+        return f.apply(successValue());
+      } catch (Exception e) {
+        return failure(e.getMessage());
+      }
+    }
+
+    @Override
+    public String toString() {
+      return String.format("Success(%s)", successValue().toString());
+    }
+
+    @Override
+    public Boolean exists(Function<A, Boolean> f) {
+      return f.apply(successValue());
+    }
+
+    @Override
+    public A getOrElse(Supplier<A> defaultValue) {
+      return successValue();
+    }
+
+    @Override
+    public <B> B foldl(Function<B, Function<A, B>> f, B identity) {
+      return f.apply(identity).apply(successValue());
+    }
+
+    @Override
+    public <B> B foldr(Function<A, Function<B, B>> f, B identity) {
+      return f.apply(successValue()).apply(identity);
+    }
+
+    @Override
+    public IO<Nothing> tryIO(Function<A, IO<Nothing>> success, Function<String, IO<Nothing>> failure) {
+      return success.apply(this.value);
+    }
+
+    public <B> IO<Result<B>> mapIO(Function<A, IO<B>> f) {
+      return foldlIO(map(f));
+    }
+    
+    @Override
+    public boolean equals(Object o){
+    	return (this == o|| o instanceof Success)
+    			&& this.value.equals(((Success<?>) o).value);
+    }
+    
+    @Override
     public int hashCode() {
-      return Objects.hashCode(value);
+    	return Objects.hashCode(value);
     }
+
   }
 
-  public static <T> Result<T> failure(String message) {
-    return new Failure<>(message);
+  public static <A> Result<A> of(final Callable<A> callable) {
+    return of(callable, "Null value");
   }
 
-  public static <T> Result<T> failure(Exception e) {
-    return new Failure<>(e);
-  }
-
-  public static <T> Result<T> failure(RuntimeException e) {
-    return new Failure<>(e);
-  }
-
-  public static <T> Result<T> success(T value) {
-    return new Success<>(value);
-  }
-
-  @SuppressWarnings("unchecked")
-  public static <T> Result<T> empty() {
-    return empty;
-  }
-
-  public static <T> Result<T> of(T value) {
-    return value != null
-        ? success(value)
-        : empty();
-  }
-
-  public static <T> Result<T> of(T value, String message) {
-    return value != null
-        ? success(value)
-        : failure(message);
-  }
-
-  public static <T> Result<T> of(Function<T, Boolean> predicate, T value) {
+  public static <A> Result<A> of(final Callable<A> callable,
+                                 final String message) {
     try {
-      return predicate.apply(value)
-          ? success(value)
-          : empty();
+      A value = callable.call();
+      return value == null
+          ? Result.failure(message)
+          : Result.success(value);
     } catch (Exception e) {
-      String errMessage =
-          String.format("Exception while evaluating predicate: %s", value);
-      return Result.failure(new IllegalStateException(errMessage, e));
+      return Result.failure(e.getMessage(), e);
     }
   }
 
-  public static <T> Result<T> of(Function<T, Boolean> predicate,
-                                 T value, String message) {
+  public static <A> Result<A> of(final Function<A, Boolean> predicate,
+                                 final A value,
+                                 final String message) {
     try {
       return predicate.apply(value)
           ? Result.success(value)
           : Result.failure(String.format(message, value));
     } catch (Exception e) {
-      String errMessage =
-          String.format("Exception while evaluating predicate: %s",
-              String.format(message, value));
-      return Result.failure(new IllegalStateException(errMessage, e));
+      String errMessage = String.format("Exception while evaluating predicate: %s", String.format(message, value));
+      return Result.failure(errMessage, e);
     }
+  }
+
+  public static <A> Result<A> of(final A value) {
+    return value != null
+        ? success(value)
+        : Result.failure("Null value");
+  }
+
+  public static <A> Result<A> of(final A value, final String message) {
+    return value != null
+        ? Result.success(value)
+        : Result.failure(message);
   }
 
   public static <A, B> Function<Result<A>, Result<B>> lift(final Function<A, B> f) {
     return x -> x.map(f);
   }
 
-  public static <A, B, C> Function<Result<A>, Function<Result<B>, Result<C>>> lift2(Function<A, Function<B, C>> f) {
+  public static <A, B, C> Function<Result<A>, Function<Result<B>, Result<C>>> lift2(final Function<A, Function<B, C>> f) {
     return a -> b -> a.map(f).flatMap(b::map);
   }
 
-  public static <A, B, C, D> Function<Result<A>, Function<Result<B>, Function<Result<C>, Result<D>>>> lift3(Function<A, Function<B, Function<C, D>>> f) {
+  public static <A, B, C, D> Function<Result<A>, Function<Result<B>, Function<Result<C>, Result<D>>>> lift3(final Function<A, Function<B, Function<C, D>>> f) {
     return a -> b -> c -> a.map(f).flatMap(b::map).flatMap(c::map);
   }
 
-  public static <A, B, C> Result<C> map2(Result<A> a, Result<B> b, Function<A, Function<B, C>> f) {
+  @SuppressWarnings("unchecked")
+  public static <A, B, C> Result<C> map2_(final Result<A> a,
+                                         final Result<B> b,
+                                         final Function<A, Function<B, C>> f) {
+    return a.isSuccess()
+        ? b.isSuccess()
+            ? Result.of(() -> f.apply(a.successValue()).apply(b.successValue()))
+            : Result.failure((Failure<C>) b)
+        : b.isSuccess()
+            ? Result.failure((Failure<C>) a)
+            : Result.failure(String.format("%s, %s", a.failureValue(), b.failureValue()));
+  }
+
+  public static <A, B, C> Result<C> map2(final Result<A> a,
+                                         final Result<B> b,
+                                         final Function<A, Function<B, C>> f) {
     return lift2(f).apply(a).apply(b);
+  }
+
+  public static <A> Result<A> unfold(A a, Function<A, Result<A>> f) {
+    Result<A> ra = Result.success(a);
+    return unfold(new Tuple<>(ra, ra), f).eval().snd;
+  }
+
+  public static <A> TailCall<Tuple<Result<A>, Result<A>>> unfold(Tuple<Result<A>, Result<A>> a, Function<A, Result<A>> f) {
+    Result<A> x = a.snd.flatMap(f::apply);
+    return x.isSuccess()
+        ? TailCall.sus(() -> unfold(new Tuple<>(a.snd, x), f))
+        : TailCall.ret(a);
+  }
+
+  public static <A> Result<A> join(Result<Result<A>> mm){
+    return mm.flatMap(m->m);
+  }
+
+  public static <A,B> B maybe(B b, Function<A,B> f, Result<A> ra){
+    return ra.map(f).getOrElse(b);
   }
 }

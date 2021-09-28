@@ -7,10 +7,13 @@ import inout.InputOutput;
 import inout.Output;
 import list.List;
 import stream.Stream;
+import tuple.Tuple;
 
+import static fpinjava.Result.maybe;
 import static fpinjava.TailCall.ret;
 import static fpinjava.TailCall.sus;
 import static stream.Stream.cons;
+import static stream.Stream.stream;
 
 public abstract class IO<A> {
 
@@ -121,18 +124,14 @@ public abstract class IO<A> {
 
   public static <A,B,C> IO<C> mapM2(Function<A, Function<B, C>> f, IO<A> ioa, IO<B> iob) {
     return liftM2(f).apply(ioa).apply(iob);
-//    return ioa.flatMap(t -> iob.map(u -> f.apply(t).apply(u)));
   }
 
   public static <A,B,C> Function<IO<A>, Function<IO<B>, IO<C>>> liftM2(final Function<A, Function<B, C>> f) {
-   // return a -> b -> a.map(f).flatMap(b::map);
-    // liftA2 f a b = f <$> a <*> b
     return a -> b -> b.ap(a.map(f));
   }
 
   public static <A,B,C> Function<IO<A>, Function<Supplier<IO<B>>, IO<C>>>
   liftA2(final Function<A, Function<B, C>> f) {
-    // liftA2 f a b = f <$> a <*> b
     return a -> sb -> sb.map(b->b.ap(a.map(f))).get();
   }
 
@@ -147,12 +146,12 @@ public abstract class IO<A> {
     return forEach(Stream.fill(n, () -> io), IO::skip);
   }
 
-  public static <A, B> IO<B> forever(IO<A> ioa) {
+  public static <A,B> IO<B> forever(IO<A> ioa) {
     Supplier<IO<B>> a  = () -> forever(ioa);
     return ioa.flatMap(x -> a.get());
   }
 
-  public static <A, B> IO<B> foldlM(Function<B, Function<A, IO<B>>> f, B z, Stream<A> s) {
+  public static <A,B> IO<B> foldlM(Function<B, Function<A, IO<B>>> f, B z, Stream<A> s) {
     return s.isEmpty()
             ? unit(z)
             : f.apply(z).apply(s.head().fst).flatMap(zz -> foldlM(f, zz, s.tail()));
@@ -213,7 +212,6 @@ public abstract class IO<A> {
     return sequenceA(s.map(f));
   }
 
-
   public static <A,B> IO<Stream<B>> mapM(Function<A,IO<B>> f, List<A> s){
     return mapM(f,Stream.of(s));
   }
@@ -236,12 +234,22 @@ public abstract class IO<A> {
     return Console.stdin();
   }
 
+  public static IO<Boolean> fEOF(Input in){
+    return pure(in.isEOF());
+  }
+  
   public static IO<String> hGetLine(Input in) {
-    try {
-      return  unit(()->in.readLine().map(t -> t.fst).successValue());
-    } catch (IllegalStateException e) {
-      throw new IllegalStateException("hGetLine: isEOFError!");
-    }
+    return pure(()->{
+      try {
+        return in.readLine().map(Tuple::fst).successValue();
+      } catch (IllegalStateException e) {
+        throw new IllegalStateException("hGetLine: isEOFError!");
+      }
+      });
+  }
+
+  public static IO<Result<String>> hGetLineMaybe(Input in) {
+    return pure(()-> Result.of(()-> in.readLine().map(Tuple::fst).successValue()));
   }
 
   public static IO<String> getLine() {
@@ -271,6 +279,17 @@ public abstract class IO<A> {
       out.shutdownOutput();
       return Nothing.instance;
     });
+  }
+
+  public static IO<Nothing> hPutStr(Output out, String s) {
+    return new Suspend<>(() -> {
+      out.print(s);
+      return Nothing.instance;
+    });
+  }
+
+  public static IO<Nothing> putStr(String s) {
+    return hPutStr(stdout(),s);
   }
 
   public static IO<Nothing> hPutStrLn(Output out, String s) {
@@ -303,7 +322,7 @@ public abstract class IO<A> {
   /*********************** InputOutput Functions *****************************/
 
   public static IO<String> hPromptLine(Output out, Input in, String req) {
-    return hPutStrLn(out,req).flatMap(x -> hGetLine(in));
+    return hPutStrLn(out,req).append(hGetLine(in)); // nicht getestet
   }
 
   public static IO<String> hPromptLine(InputOutput inout, String req) {
@@ -315,7 +334,8 @@ public abstract class IO<A> {
   }
 
   public static IO<Stream<String>> hPromptLines(Output out, Input in, String req) {
-    return hPutStrLn(out,req).flatMap(x -> hGetLines(in));
+   // return hPutStrLn(out,req).flatMap(x -> hGetLines(in)); //getestet
+    return hPutStrLn(out,req).append(hGetLines(in));//nicht getestet!
   }
 
   public static IO<Stream<String>> hPromptLines(InputOutput inout, String req) {
@@ -328,7 +348,6 @@ public abstract class IO<A> {
 
   // nicht stack safe!
   public static IO<Stream<String>> hPromptLineByLine(Output out, Input in, Stream<String> reqs) {
-   // return sequenceA(reqs.map(r-> hPromptLine(out,in,r)));
     return mapM(r-> hPromptLine(out,in,r),reqs);
   }
 
@@ -337,8 +356,33 @@ public abstract class IO<A> {
     return hPromptLineByLine(inout,inout,reqs);
   }
 
+  public static IO<Stream<String>> hPromptLineByLine(InputOutput inout, String... reqs) {
+    return hPromptLineByLine(inout,inout,stream(reqs));
+  }
+
   public static IO<Nothing> hLineInteract(Input in, Output out, Function<String,String> f){
     return hGetLines(in).map(l->l.map(f)).flatMap(l-> hPutStrLns_(out,l));
+  }
+
+  public static <S> IO<Nothing> hLineInteractWith(Input in, Output out,
+                                                  S state,
+                                                    Function<S,Function<String,Result<Tuple<String,S>>>> f) {
+    return hGetLineMaybe(in).bind(rx->
+            maybe(pure(Nothing.instance)
+            ,x -> {
+              Result<Tuple<String,S>> y = f.apply(state).apply(x);
+              return maybe(pure(Nothing.instance)
+                      ,t->hPutStr(out,y.successValue().fst).append(
+                      hLineInteractWith(in,out,y.successValue().snd,f))
+                              ,y);
+            }
+            ,rx)
+    );
+  }
+
+  public static <S> IO<Nothing> lineInteractWith(S state,
+                                                  Function<S,Function<String,Result<Tuple<String,S>>>> f) {
+    return hLineInteractWith(stdin(),stdout(),state,f);
   }
 
   public static IO<Nothing> hLineInteract(InputOutput inout, Function<String,String> f){
@@ -353,11 +397,11 @@ public abstract class IO<A> {
     return hLineInteract(in, out, Function.identity());
   }
 
-  public static IO<Nothing> hLineCopy(InputOutput inout){
+  public static IO<Nothing> hLineEcho(InputOutput inout){
     return hLineCopy(inout,inout);
   }
 
-  public static IO<Nothing> lineCopy(){
+  public static IO<Nothing> lineEcho(){
     return hLineInteract(stdin(), stdout(), Function.identity());
   }
 
