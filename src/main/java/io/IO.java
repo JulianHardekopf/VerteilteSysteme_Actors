@@ -1,5 +1,5 @@
 package io;
-
+/*
 import fpinjava.*;
 import inout.Console;
 import inout.Input;
@@ -12,7 +12,7 @@ import tuple.Tuple;
 import static fpinjava.Result.maybe;
 import static fpinjava.TailCall.ret;
 import static fpinjava.TailCall.sus;
-import static stream.Stream.cons;
+import static stream.Stream.Cons;
 import static stream.Stream.stream;
 
 public abstract class IO<A> {
@@ -229,7 +229,7 @@ public abstract class IO<A> {
   }
 
   /************************ Input Functions *******************************/
-
+/*
   public static Input stdin(){
     return Console.stdin();
   }
@@ -269,7 +269,7 @@ public abstract class IO<A> {
   }
 
   /************************* Output Functions ******************************/
-
+/*
   public static Output stdout(){
     return Console.stdout();
   }
@@ -320,6 +320,7 @@ public abstract class IO<A> {
   }
 
   /*********************** InputOutput Functions *****************************/
+/*
 
   public static IO<String> hPromptLine(Output out, Input in, String req) {
     return hPutStrLn(out,req).append(hGetLine(in)); // nicht getestet
@@ -487,3 +488,5 @@ public abstract class IO<A> {
     }
   }
 }
+
+*/

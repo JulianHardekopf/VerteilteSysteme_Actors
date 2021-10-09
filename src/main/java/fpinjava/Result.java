@@ -1,22 +1,22 @@
 package fpinjava;
 
-import io.IO;
+
 
 import java.io.Serializable;
 import java.util.Objects;
 //import java.util.concurrent.Callable;
 
-import static io.IO.unit;
+
 import tuple.Tuple;
 
 public abstract class Result<A> implements Serializable {
 
   private Result() {
   }
-
+/*
   public abstract <B> IO<Result<B>> mapIO(Function<A, IO<B>> f);
   public abstract <B> IO<Result<B>> flatMapIO(Function<A,  IO<Result<B>>> f);
-
+*/
   public abstract Boolean isSuccess();
   public abstract Boolean isFailure();
   public abstract Boolean isEmpty();
@@ -40,7 +40,7 @@ public abstract class Result<A> implements Serializable {
   public abstract Result<Nothing> mapEmpty();
   public abstract <B> Result<B> flatMap(Function<A, Result<B>> f);
   public abstract Boolean exists(Function<A, Boolean> f);
-  public abstract IO<Nothing> tryIO(Function<A, IO<Nothing>> success, Function<String, IO<Nothing>> failure);
+  //public abstract IO<Nothing> tryIO(Function<A, IO<Nothing>> success, Function<String, IO<Nothing>> failure);
 
 
   // ap(Nothing, _ )          = Nothing
@@ -62,13 +62,13 @@ public abstract class Result<A> implements Serializable {
   public Result<A> orElse(Supplier<Result<A>> defaultValue) {
     return map(x -> this).getOrElse(defaultValue);
   }
-
+/*
   public static <A> IO<Result<A>> foldlIO(Result<IO<A>> r) {
     IO<Result<A>> z = IO.unit(Result.empty());
     Function<IO<Result<A>>, Function<IO<A>, IO<Result<A>>>> f = iors -> ios -> iors.flatMap(rs -> ios.flatMap(s -> IO.unit(Result.of(s))));
     return r.foldl(f, z);
   }
-
+*/
   public static <T, U> Result<T> failure(Failure<U> failure) {
     return new Failure<>(failure.exception);
   }
@@ -217,7 +217,7 @@ public abstract class Result<A> implements Serializable {
     public A getOrElse(Supplier<A> defaultValue) {
       return defaultValue.get();
     }
-
+/*
     @Override
     public IO<Nothing> tryIO(Function<A, IO<Nothing>> success, Function<String, IO<Nothing>> failure) {
       return failure.apply(exception.getMessage());
@@ -226,7 +226,7 @@ public abstract class Result<A> implements Serializable {
     public <U> IO<Result<U>> mapIO(Function<A, IO<U>> f) {
       return IO.unit(failure(this));
     }
-    
+  */
     @Override
     public boolean equals(Object o){
     	return (this == o || o instanceof Failure);
@@ -244,12 +244,12 @@ public abstract class Result<A> implements Serializable {
     public Empty() {
       super();
     }
-
+/*
     @Override
     public <B> IO<Result<B>> flatMapIO(Function<A, IO<Result<B>>> f) {
       return null;
     }
-
+*/
     @Override
     public Boolean isSuccess() {
       return false;
@@ -369,7 +369,7 @@ public abstract class Result<A> implements Serializable {
     public <B> B foldr(Function<A, Function<B, B>> f, B identity) {
       return identity;
     }
-
+/*
     @Override
     public IO<Nothing> tryIO(Function<A, IO<Nothing>> success, Function<String, IO<Nothing>> failure) {
       return failure.apply("Empty Result");
@@ -378,7 +378,7 @@ public abstract class Result<A> implements Serializable {
     public <B> IO<Result<B>> mapIO(Function<A, IO<B>> f) {
       return IO.unit(Result.empty());
     }
-    
+  */
     @Override
     public boolean equals(Object o){
     	return (this == o || o instanceof Empty);
@@ -399,12 +399,12 @@ public abstract class Result<A> implements Serializable {
       super();
       this.value = value;
     }
-
+/*
     @Override
     public <B> IO<Result<B>> flatMapIO(Function<A, IO<Result<B>>> f) {
       return null;
     }
-
+*/
     @Override
     public Boolean isSuccess() {
       return true;
@@ -541,7 +541,7 @@ public abstract class Result<A> implements Serializable {
     public <B> B foldr(Function<A, Function<B, B>> f, B identity) {
       return f.apply(successValue()).apply(identity);
     }
-
+/*
     @Override
     public IO<Nothing> tryIO(Function<A, IO<Nothing>> success, Function<String, IO<Nothing>> failure) {
       return success.apply(this.value);
@@ -550,7 +550,7 @@ public abstract class Result<A> implements Serializable {
     public <B> IO<Result<B>> mapIO(Function<A, IO<B>> f) {
       return foldlIO(map(f));
     }
-    
+  */
     @Override
     public boolean equals(Object o){
     	return (this == o|| o instanceof Success)

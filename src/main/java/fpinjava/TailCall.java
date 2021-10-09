@@ -52,6 +52,7 @@ public abstract class TailCall<T> {
       return tailRec.eval();
     }
 
+
     @Override
     public boolean isSuspend() {
       return true;
