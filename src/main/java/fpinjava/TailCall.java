@@ -1,5 +1,10 @@
 package fpinjava;
 
+import list.List;
+import tuple.Tuple;
+
+import static list.List.list;
+
 public abstract class TailCall<T> {
 
   public abstract TailCall<T> resume();
@@ -42,6 +47,8 @@ public abstract class TailCall<T> {
     private Suspend(Supplier<TailCall<T>> resume) {
       this.resume = resume;
     }
+
+
 
     @Override
     public T eval() {

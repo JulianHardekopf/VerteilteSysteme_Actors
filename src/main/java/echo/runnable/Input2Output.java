@@ -1,20 +1,28 @@
 package echo.runnable;
-import inout.ConsoleReader;
-import inout.ConsoleWriter;
-import inout.Input;
-import inout.Output;
+import inout.*;
+import list.List;
+import stream.Stream;
 
-public class Input2Output {
+
+public class Input2Output implements Runnable {
 
     public static void main(String[] args) {
-        Input input = ConsoleReader.stdin();
-        Output output = ConsoleWriter.stdout();
-        input2output(input,output).run();
-        output.shutdownOutput();
+        input2output(ConsoleReader.stdin(),ConsoleWriter.stdout()).run();
     }
 
     static Runnable input2output(Input in, Output out) {
-        return in == null ? null : () -> in.readLine().forEach(System.out::println);
+
+        return () -> { in.readLines().forEach(out::printLine);
+            out.shutdownOutput();
+        };
+
+    }
+
+
+    @Override
+    public void run() {
+
     }
 
 }
+

@@ -15,7 +15,7 @@ public  class AbstractWriter implements Output {
 
     @Override
     public void printLine(String s) {
-        Output.super.printLine(s);
+        pw.println(s);
     }
 
     @Override

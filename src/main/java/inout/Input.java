@@ -4,7 +4,7 @@ package inout;
 import fpinjava.Result;
 import tuple.Tuple;
 
-import java.util.stream.Stream;
+import stream.Stream;
 
 
 public interface Input extends AutoCloseable {
@@ -33,7 +33,8 @@ public interface Input extends AutoCloseable {
     static Result<Integer> readMaybe(String s){
         return Result.of(()->Integer.parseInt(s));
     }
-/*
+
+
     default Stream<String> readLines() {
         return Stream.<String,Input>unfold(this, Input::readLine);
     }
@@ -41,10 +42,11 @@ public interface Input extends AutoCloseable {
     default Stream<Integer> readInts() {
         return Stream.<Integer,Input>unfold(this, Input::readInt);
     }
-*/
+
+
     default void shutdownInput(){
         try {
-            close();
+            System.out.flush();
         } catch (Exception e) {
             e.printStackTrace();
         }

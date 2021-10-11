@@ -5,6 +5,7 @@ import java.util.Objects;
 
 public class Tuple<A,B> implements Serializable {
 
+
     public final A fst;
     public final B snd;
 
