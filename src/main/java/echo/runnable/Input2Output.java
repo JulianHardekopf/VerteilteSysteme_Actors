@@ -1,7 +1,5 @@
 package echo.runnable;
 import inout.*;
-import list.List;
-import stream.Stream;
 
 
 public class Input2Output {
