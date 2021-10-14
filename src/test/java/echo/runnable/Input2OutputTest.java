@@ -1,6 +1,6 @@
 package echo.runnable;
 
-import inout.Input;
+
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -16,10 +16,22 @@ public  class Input2OutputTest {
 							"'HalloHallo\njaja'"})
 
 	public void test(String s) {
-    	assertEquals("bla","bla");
+		ScriptReader sr = new ScriptReader(s);
+		ScriptWriter sw = new ScriptWriter();
+		Input2Output.input2output(sr, sw).run();
+		assertEquals(sr.toList(), sw.toList());
 
-		assertEquals(new ScriptReader(s).toList(), Input2Output.input2output(new ScriptReader(s), new ScriptWriter()));
-		//run.()
+	}
+
+	public static void main(String[] args) {
+		ScriptReader sr = new ScriptReader("wef \n");
+
+		ScriptWriter sw = new ScriptWriter();
+
+		Input2Output.input2output(sr, sw).run();
+		System.out.println(sr.toList());
+		System.out.println(sw.toList());
+
 	}
 
 }

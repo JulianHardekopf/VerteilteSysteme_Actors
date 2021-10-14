@@ -34,7 +34,6 @@ public class ScriptReader implements Input {
             return Result.failure(e);
         }
     }
-    // nicht sicher Methodenkopf und Bezug
     public List<String> toList() {
         return commands;
     }

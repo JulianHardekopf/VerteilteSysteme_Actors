@@ -11,16 +11,13 @@ public  class AbstractWriter implements Output {
 
     @Override
     public void print(String s) {
+        pw.print(s);
+        pw.flush();
     }
 
     @Override
     public void printLine(String s) {
         pw.println(s);
-    }
-
-    @Override
-    public void shutdownOutput() {
-        Output.super.shutdownOutput();
     }
 
     @Override

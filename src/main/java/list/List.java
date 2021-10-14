@@ -13,6 +13,10 @@ public abstract class List<A> {
     public abstract boolean isEmpty();
     public abstract List<A> setHead(A h);
     public abstract List<A> dropWhile(Function<A, Boolean> f);
+    public static <A> List<A> append(List<A> xs, List<A> ys) {
+        return xs.isEmpty() ? ys
+                : new Cons<>(xs.head(), append(xs.tail(), ys));
+    }
 
 
     @SuppressWarnings("rawtypes")
@@ -40,6 +44,8 @@ public abstract class List<A> {
         public List<A> dropWhile(Function<A, Boolean> f) {
             return this;
         }
+
+
 
 
 

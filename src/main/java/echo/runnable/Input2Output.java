@@ -4,25 +4,20 @@ import list.List;
 import stream.Stream;
 
 
-public class Input2Output implements Runnable {
+public class Input2Output {
 
     public static void main(String[] args) {
         input2output(ConsoleReader.stdin(),ConsoleWriter.stdout()).run();
+
     }
 
     static Runnable input2output(Input in, Output out) {
 
-        return () -> { in.readLines().forEach(out::printLine);
+        return () -> { in.readLines().forEach(out::print);
             out.shutdownOutput();
         };
-
     }
 
-
-    @Override
-    public void run() {
-
-    }
 
 }
 
