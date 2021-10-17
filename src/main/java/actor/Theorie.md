@@ -45,3 +45,5 @@ Warum ist das so?
 UserThreadFactory
 Warum terminiert das Programm nicht?
     Weil UserThreads die Eigenschaft haben, dass das Programm erst terminiert, wenn alle UserThreads ihre Aufgaben erledigt haben.
+
+
