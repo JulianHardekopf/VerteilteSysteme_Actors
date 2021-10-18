@@ -15,6 +15,10 @@ public class ScriptWriter implements Output {
          commands = commands.cons(s);
     }
 
+    public void printLine(String s) {
+        commands = commands.cons(s);
+    }
+
     public List<String> toList() {
 
         return commands;
