@@ -29,6 +29,8 @@ public abstract class AbstractActor<T> implements Actor<T> {
             }
         };
     }
+
+
     public abstract void onReceive(T message, Result<Actor<T>> sender);
     public Result<Actor<T>> self() {
         return Result.success(this);

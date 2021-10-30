@@ -2,6 +2,7 @@ package actor;
 
 import fpinjava.Result;
 
+
 import java.util.concurrent.Semaphore;
 
 public class PingPong {
@@ -37,8 +38,10 @@ public class PingPong {
         @Override
         public void onReceive(Integer message, Result<Actor<Integer>> sender) {
             System.out.println(sound+"-"+ message);
+
             if (message >= 10) {
                 referee.tell(message, sender);
+
             } else {
                 sender.forEachOrFail(actor -> actor.tell(message + 1, self()))
                         .forEach(ignore -> referee.tell(message, sender));
