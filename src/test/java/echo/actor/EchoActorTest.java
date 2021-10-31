@@ -1,19 +1,10 @@
 package echo.actor;
 
-import actor.AbstractActor;
 import actor.Actor;
-import actor.ActorReader;
 import actor.AskStream;
-import inout.AbstractReader;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-
-import java.io.BufferedReader;
-import java.util.stream.Stream;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTimeout;
-import static list.List.list;
 
 public  class EchoActorTest {
 
@@ -23,9 +14,18 @@ public  class EchoActorTest {
 	public void test(String s) {
 
 		EchoActor<String> echo = new EchoActor<>("echo", Actor.Type.SERIAL);
-		AskStream.ask(echo, s, 10);
-		// prüfen ob element von Ask gleich dem String s
 
+		// prüfen ob element von Ask gleich dem String s
     	assertEquals(AskStream.ask(echo,s, 10).head(), s);
 	}
+
+	public static void main(String[] args) {
+
+		EchoActor<String> echo = new EchoActor<>("echo", Actor.Type.SERIAL);
+		AskStream.ask(echo, "FunktPrint", 10);
+		// prüfen ob element von Ask gleich dem String s
+
+		System.out.println(AskStream.ask(echo, "funktPrint", 10).head());
+	}
+
 }

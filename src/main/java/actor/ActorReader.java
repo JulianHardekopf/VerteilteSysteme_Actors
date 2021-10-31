@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
 
 public class ActorReader extends AbstractActor<String> implements Input {
     private final long timeout;
-    private final int capacityOfQueue = 20;
+    private final int capacityOfQueue = 50;
     BlockingQueue<String> blockingQueue
             = new LinkedBlockingQueue<>(
             capacityOfQueue);
@@ -26,7 +26,11 @@ public class ActorReader extends AbstractActor<String> implements Input {
         // hier die Nachricht in die BlockingQueue gespeichert
         // Dies muss weiter an die Readline gegeben werden
 
-            blockingQueue.offer(message);
+            try {
+                blockingQueue.offer(message);
+            } catch (NullPointerException e) {
+                blockingQueue.remove();
+            }
 
     }
 
@@ -37,7 +41,7 @@ public class ActorReader extends AbstractActor<String> implements Input {
         // poll Methode wartet timeout lang auf ein Element
         // schmeißt sonst das Result.failure
         // Tuple evtl. anders aufbauen
-        return Result.of(() -> blockingQueue.poll(timeout, TimeUnit.MILLISECONDS)).map(s -> new Tuple(s, this));
+        return Result.of(() -> blockingQueue.poll(timeout, TimeUnit.MILLISECONDS)).map(s -> new Tuple<>(s, this));
 
     }
     static Input actorReader(String id, Type type, long timeout) {

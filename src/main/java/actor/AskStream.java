@@ -15,7 +15,7 @@ public class AskStream extends AbstractActor<String> {
         // ask erzeugt einen neuen Actor
         ActorReader tempActor = new ActorReader(message, Actor.Type.SERIAL, timeout);
         // tempActor sendet die Nachricht an den Actor
-        tempActor.tell(message, actor);
+        actor.tell(message, tempActor);
         // tempActor nimmt die antwort entgegen und gibt diese als Stream wieder <- onReceive?
         // Timeout-Frist muss auch beachtet werden <- blockingQueue?
         // return antwort als Stream<String>
