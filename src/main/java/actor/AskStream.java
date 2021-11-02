@@ -4,12 +4,7 @@ import fpinjava.Result;
 import stream.Stream;
 
 
-public class AskStream extends AbstractActor<String> {
-
-
-    public AskStream(String id, Type type) {
-        super(id, type);
-    }
+public class AskStream  {
 
     public static Stream<String> ask(Actor<String> actor, String message, long timeout) {
         // ask erzeugt einen neuen Actor
@@ -24,8 +19,4 @@ public class AskStream extends AbstractActor<String> {
     }
 
 
-    @Override
-    public void onReceive(String message, Result<Actor<String>> sender) {
-        sender.forEach(stringActor -> stringActor.tell(message , self()));
-    }
 }

@@ -25,15 +25,9 @@ public class ActorReader extends AbstractActor<String> implements Input {
         //  was soll getan werden, wenn eine Nachricht erhalten wird?
         // hier die Nachricht in die BlockingQueue gespeichert
         // Dies muss weiter an die Readline gegeben werden
-
-            try {
-                blockingQueue.offer(message);
-            } catch (NullPointerException e) {
-                blockingQueue.remove();
-            }
+        blockingQueue.add(message);
 
     }
-
 
     @Override
     public Result<Tuple<String , Input>> readLine() {
@@ -41,9 +35,12 @@ public class ActorReader extends AbstractActor<String> implements Input {
         // poll Methode wartet timeout lang auf ein Element
         // schmeißt sonst das Result.failure
         // Tuple evtl. anders aufbauen
+        // Tutor: shutdown input (wann schließt sich der input)
+        shutdownInput();
         return Result.of(() -> blockingQueue.poll(timeout, TimeUnit.MILLISECONDS)).map(s -> new Tuple<>(s, this));
-
     }
+
+
     static Input actorReader(String id, Type type, long timeout) {
 
         return new ActorReader(id, type, timeout);

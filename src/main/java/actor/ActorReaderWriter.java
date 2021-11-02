@@ -6,42 +6,36 @@ import tuple.Tuple;
 
 
 public class ActorReaderWriter extends AbstractActor<String> implements InputOutput {
-    private  ActorReader actorReader;
-    private  Actor<String> actor;
-    public ActorReaderWriter(String id, Actor<String> actor, long timeout) {
-        // Type.Serial idk nur damit Fehlermeldung weggeht
+    private  final ActorReader actorReader;
+    private  final Actor<String> actor;
+    public ActorReaderWriter(String id, Actor<String> actor, long timeout, ActorReader actorReader, Actor<String> actor1) {
         super(id, Type.SERIAL);
-
-        // Konstruktor match nicht mit der vorgebenenen Fabrikmethode von Krohn
-
-        // this.actorReader = actorReader;
-        // this.actor = actor;
-
+        this.actorReader = actorReader;
+        this.actor = actor1;
     }
 
     @Override
     public void onReceive(String message, Result<Actor<String>> sender) {
-        // Nachricht wieder reinholen
-        actorReader.tell(message);
+
+        actorReader.tell(message, sender);
 
     }
 
     @Override
     public Result<Tuple<String, Input>> readLine() {
-        // Das Interface Input können Sie dann ganz einfach implementieren,
-        // indem Sie die Funktionalität an den ActorReader delegieren
-        // so ?
+        shutdownInput();
         return actorReader.readLine();
+
     }
 
     @Override
     public void print(String s) {
-
+        shutdownOutput();
         actor.tell(s ,self());
     }
-    static ActorReaderWriter actorReaderWriter(String id, Actor<String> actor, long timeout) {
+    static ActorReaderWriter actorReaderWriter(String id, Actor<String> actor, long timeout, ActorReader actorReader, Actor<String> actor1) {
 
-        return new ActorReaderWriter(id, actor, timeout);
+        return new ActorReaderWriter(id, actor, timeout, actorReader, actor1);
     }
     @Override
     public void close() throws Exception {
