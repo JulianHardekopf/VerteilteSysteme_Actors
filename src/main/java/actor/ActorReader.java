@@ -26,7 +26,7 @@ public class ActorReader extends AbstractActor<String> implements Input {
         // hier die Nachricht in die BlockingQueue gespeichert
         // Dies muss weiter an die Readline gegeben werden
         blockingQueue.add(message);
-
+        shutdownInput();
     }
 
     @Override
@@ -36,8 +36,16 @@ public class ActorReader extends AbstractActor<String> implements Input {
         // schmeißt sonst das Result.failure
         // Tuple evtl. anders aufbauen
         // Tutor: shutdown input (wann schließt sich der input)
-        shutdownInput();
-        return Result.of(() -> blockingQueue.poll(timeout, TimeUnit.MILLISECONDS)).map(s -> new Tuple<>(s, this));
+        try {
+
+            return blockingQueue.contains("\u0004")
+                    ? Result.empty()
+                    : Result.success(blockingQueue.poll(timeout, TimeUnit.MILLISECONDS)).map(s -> new Tuple<>(s, this));
+
+        } catch (Exception e) {
+            return Result.failure(e);
+        }
+
     }
 
 
