@@ -19,13 +19,4 @@ public  class EchoActorTest {
     	assertEquals(AskStream.ask(echo,s, 10).head(), s);
 	}
 
-	public static void main(String[] args) {
-
-		EchoActor<String> echo = new EchoActor<>("echo", Actor.Type.SERIAL);
-		AskStream.ask(echo, "FunktPrint", 10);
-		// prüfen ob element von Ask gleich dem String s
-
-		System.out.println(AskStream.ask(echo, "funktPrint", 10).head());
-	}
-
 }

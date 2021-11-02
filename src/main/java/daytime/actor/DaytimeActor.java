@@ -2,8 +2,8 @@ package daytime.actor;
 import actor.AbstractActor;
 import actor.Actor;
 import fpinjava.Result;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDateTime;
+
 
 
 public class DaytimeActor extends AbstractActor<String> {
@@ -12,8 +12,7 @@ public class DaytimeActor extends AbstractActor<String> {
     }
     @Override
     public void onReceive(String message, Result<Actor<String>> sender) {
-
-        sender.forEach(s -> s.tell("daytime is:" + new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date()), sender));
+        sender.forEach(s -> s.tell(message + LocalDateTime.now(), sender));
     }
 
 }
