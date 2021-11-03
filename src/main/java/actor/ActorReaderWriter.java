@@ -16,25 +16,21 @@ public class ActorReaderWriter extends AbstractActor<String> implements InputOut
 
     @Override
     public void onReceive(String message, Result<Actor<String>> sender) {
-
         actorReader.tell(message, sender);
 
     }
 
     @Override
     public Result<Tuple<String, Input>> readLine() {
-        shutdownInput();
         return actorReader.readLine();
 
     }
 
     @Override
     public void print(String s) {
-        shutdownOutput();
         actor.tell(s ,self());
     }
     static ActorReaderWriter actorReaderWriter(String id, Actor<String> actor, long timeout, ActorReader actorReader, Actor<String> actor1) {
-
         return new ActorReaderWriter(id, actor, timeout, actorReader, actor1);
     }
     @Override

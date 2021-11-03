@@ -3,6 +3,8 @@ package actor;
 import fpinjava.Result;
 import inout.Input;
 import tuple.Tuple;
+
+import java.util.Objects;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -26,7 +28,6 @@ public class ActorReader extends AbstractActor<String> implements Input {
         // hier die Nachricht in die BlockingQueue gespeichert
         // Dies muss weiter an die Readline gegeben werden
         blockingQueue.add(message);
-        shutdownInput();
     }
 
     @Override
@@ -37,10 +38,11 @@ public class ActorReader extends AbstractActor<String> implements Input {
         // Tuple evtl. anders aufbauen
         // Tutor: shutdown input (wann schließt sich der input)
         try {
-
-            return blockingQueue.contains("\u0004")
+            String s = blockingQueue.poll(timeout, TimeUnit.MILLISECONDS);
+            assert s != null;
+            return s.equals("\u0004")
                     ? Result.empty()
-                    : Result.success(blockingQueue.poll(timeout, TimeUnit.MILLISECONDS)).map(s -> new Tuple<>(s, this));
+                    : Result.success(new Tuple<>(s, this));
 
         } catch (Exception e) {
             return Result.failure(e);
