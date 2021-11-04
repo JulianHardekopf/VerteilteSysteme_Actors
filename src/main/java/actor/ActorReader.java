@@ -39,8 +39,7 @@ public class ActorReader extends AbstractActor<String> implements Input {
         // Tutor: shutdown input (wann schließt sich der input)
         try {
             String s = blockingQueue.poll(timeout, TimeUnit.MILLISECONDS);
-            assert s != null;
-            return s.equals("\u0004")
+            return s == null || s.equals("\u0004")
                     ? Result.empty()
                     : Result.success(new Tuple<>(s, this));
 
