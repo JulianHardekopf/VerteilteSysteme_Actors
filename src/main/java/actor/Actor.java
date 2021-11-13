@@ -1,6 +1,8 @@
 package actor;
 
 import fpinjava.Result;
+import inout.Input;
+import tuple.Tuple;
 
 public interface Actor<T> {
     static <T> Result<Actor<T>> noSender() {
@@ -16,6 +18,9 @@ public interface Actor<T> {
     default void tell(T message, Actor<T> sender) {
         tell(message, Result.of(sender));
     }
+
+
+
     enum Type {SERIAL, PARALLEL}
 
 }
