@@ -18,21 +18,21 @@ public class Writer extends AbstractActor<String> {
         this.reader = new Reader(id, type, inputObject);
     }
 
-    @Override
-    public void tell(String message, Result<Actor<String>> sender) {
-        outputObject.printLine(message);
-    }
 
     @Override
     public void onReceive(String message, Result<Actor<String>> sender) {
-        // Der Writer schreibt jeden String, den seine tell-Methode empfängt, auf das Output-Objekt.
-        // reader.tell(message, sender);
-        reader.tell(inputObject.readLine(message).toString(), sender);
+        // Writer schreibt jede Empfange Nachricht auf das Output Objekt
+        // Bei EOF wir das outputObjekt geschlossen
         if(message.equals("\u0004")) {
             outputObject.shutdownOutput();
+        } else {
+            outputObject.printLine(message);
         }
+
     }
     public void start() {
+        // Erzeugter Reader ruft bei Start die Tell Methode auf mit einem leeren String
+        // und gibt als Referenz den Writer auf
         reader.tell("",self());
     }
 }

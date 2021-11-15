@@ -1,5 +1,7 @@
 package inout;
 
+import actor.Writer;
+
 public interface InputOutput extends Input, Output {
     // Shutdown Input/Output angeben
 
@@ -12,4 +14,6 @@ public interface InputOutput extends Input, Output {
     default void shutdownOutput() {
         Output.super.shutdownOutput();
     }
+
+
 }
