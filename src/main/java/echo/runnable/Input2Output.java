@@ -8,9 +8,11 @@ import static java.lang.Thread.sleep;
 
 public class Input2Output {
 
+    private static Actor<String> producer;
+
     public static void main(String[] args) throws InterruptedException {
        // input2output(ConsoleReader.stdin(),ConsoleWriter.stdout()).run();
-        input2output(new Writer("", Actor.Type.SERIAL, ConsoleReader.stdin(), ConsoleWriter.stdout())).run();
+        input2output(new Writer("", Actor.Type.SERIAL, ConsoleReader.stdin(), ConsoleWriter.stdout(), producer)).run();
         sleep(10000);
     }
 

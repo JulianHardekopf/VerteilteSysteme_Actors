@@ -3,19 +3,22 @@ package actor;
 import fpinjava.Result;
 import inout.Input;
 import inout.Output;
-import inout.ScriptReader;
 
 
 public class Writer extends AbstractActor<String> {
     private final Input inputObject;
     private final Output outputObject;
     private final Reader reader;
+    private final Actor<String> producer;
+    private final String EOT = "\u0004";
 
-    public Writer(String id, Type type, Input inputObject, Output outputObject) {
+
+    public Writer(String id, Type type, Input inputObject, Output outputObject, Actor producer) {
         super(id, type);
         this.inputObject = inputObject;
         this.outputObject = outputObject;
-        this.reader = new Reader(id, type, inputObject);
+        this.producer = producer;
+        this.reader = new Reader(id, type, inputObject, this.producer);
     }
 
 
@@ -23,7 +26,8 @@ public class Writer extends AbstractActor<String> {
     public void onReceive(String message, Result<Actor<String>> sender) {
         // Writer schreibt jede Empfange Nachricht auf das Output Objekt
         // Bei EOF wir das outputObjekt geschlossen
-        if(message.equals("\u0004")) {
+
+        if(message.equals(EOT)) {
             outputObject.shutdownOutput();
         } else {
             outputObject.printLine(message);
