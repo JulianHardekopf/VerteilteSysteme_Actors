@@ -23,12 +23,10 @@ public  class Input2OutputTest {
 		ScriptWriter scriptWriter = new ScriptWriter();
 		Writer w = new Writer(s, Actor.Type.SERIAL, scriptReader, scriptWriter, producer);
 		// Input to Output mit den Writer als Runnable ausführen
-
-		// doch nicht mit Input2Output <- steht aber wahrscheinlioch im Ticket
-		input2output(w).run();
+		w.start();
 		// Damit der MainThread nicht sofort terminiert
 		sleep(500);
-		w.start();
+
 
 		assertEquals(scriptReader.toList(), scriptWriter.toList());
 

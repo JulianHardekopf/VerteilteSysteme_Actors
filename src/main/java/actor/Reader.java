@@ -19,7 +19,7 @@ public class Reader extends AbstractActor<String> {
         //Textzeilen werden als Stream verarbeitet und an den Writer übergeben
         inputObject.readLines().forEach(s -> sender.forEach(stringActor -> stringActor.tell(s)));
         // Bei erfolgreichen einlesen wird dem Writer am ende EOT mitgeteilt
-        sender.successValue().tell(EOT, self());
+        sender.forEach(a -> a.tell(EOT, self()));
     }
 
 }
