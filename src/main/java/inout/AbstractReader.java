@@ -8,7 +8,7 @@ import java.io.BufferedReader;
 
 public abstract class AbstractReader implements Input {
 
-    protected final BufferedReader reader;
+    private final BufferedReader reader;
     protected AbstractReader(BufferedReader reader) {
         this.reader = reader;
     }
