@@ -26,7 +26,7 @@ public abstract class AbstractReader implements Input {
     @Override
     public Result<Tuple<Integer, Input>> readInt() {
         try {
-            // not sure
+
             String s = reader.readLine();
             return s.length() == 0
                     ? Result.empty()

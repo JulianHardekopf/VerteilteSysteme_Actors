@@ -13,7 +13,7 @@ public class TCPReaderWriter implements InputOutput {
     private final AbstractReader abstractReader;
     private final AbstractWriter abstractWriter;
 
-    public TCPReaderWriter(Socket socket, AbstractReader abstractReader, AbstractWriter abstractWriter) {
+    private TCPReaderWriter(Socket socket, AbstractReader abstractReader, AbstractWriter abstractWriter) {
         this.socket = socket;
         this.abstractReader = abstractReader;
         this.abstractWriter = abstractWriter;
@@ -60,33 +60,30 @@ public class TCPReaderWriter implements InputOutput {
         }
     }
 
-    static Callable<InputOutput> accept(int localPort){
+    public static Callable<InputOutput> accept(int localPort){
         return () -> {
             ServerSocket serverSocket = new ServerSocket(localPort);
             Socket socket = serverSocket.accept();
 
-            AbstractReader in = new AbstractReader(new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
-                @Override
-                public void close() throws Exception {
-                    socket.close();
-                }
-            };
-            AbstractWriter out = new AbstractWriter(new PrintWriter(socket.getOutputStream()));
-            return new TCPReaderWriter(socket, in, out);
+            return getInputOutput(socket);
         };
     }
 
-    static Callable<InputOutput> connectTo(String remoteHost, int remotePort) {
+    private static InputOutput getInputOutput(Socket socket) throws IOException {
+        AbstractReader in = new AbstractReader(new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
+            @Override
+            public void close() throws Exception {
+                socket.close();
+            }
+        };
+        AbstractWriter out = new AbstractWriter(new PrintWriter(socket.getOutputStream(), true));
+        return new TCPReaderWriter(socket, in, out);
+    }
+
+    public static Callable<InputOutput> connectTo(String remoteHost, int remotePort) {
         return () -> {
             Socket socket = new Socket(remoteHost, remotePort);
-            AbstractReader in = new AbstractReader(new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
-                @Override
-                public void close() throws Exception {
-                    socket.close();
-                }
-            };
-            AbstractWriter out = new AbstractWriter(new PrintWriter(socket.getOutputStream()));
-            return new TCPReaderWriter(socket, in, out);
+            return getInputOutput(socket);
         };
     }
 }

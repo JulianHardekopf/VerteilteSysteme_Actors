@@ -20,6 +20,7 @@ public class TCPReader extends AbstractReader{
     }
 
 
+
     @Override
     public Result<Tuple<String, Input>> readLine(String message) {
         return super.readLine(message);
@@ -62,7 +63,7 @@ public class TCPReader extends AbstractReader{
             return new TCPReader(bufferedReader, socket);
         };
     }
-    static Callable<Input> connectTo(String remoteHost, int remotePort) {
+     public static Callable<Input> connectTo(String remoteHost, int remotePort) {
         return () -> {
             Socket socket = new Socket(remoteHost, remotePort);
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));

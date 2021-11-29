@@ -39,7 +39,7 @@ public class TCPWriter extends AbstractWriter {
         socket.close();
     }
 
-    static Callable<Output> accept(int localPort) {
+    public static Callable<Output> accept(int localPort) {
       return () -> {
           ServerSocket serverSocket = new ServerSocket(localPort);
           Socket socket = serverSocket.accept();
