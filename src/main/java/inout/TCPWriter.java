@@ -9,7 +9,7 @@ import java.net.Socket;
 
 public class TCPWriter extends AbstractWriter {
     private final Socket socket;
-    protected TCPWriter(PrintWriter pw, Socket socket) {
+    public TCPWriter(PrintWriter pw, Socket socket) {
         super(pw);
         this.socket = socket;
 
@@ -44,6 +44,7 @@ public class TCPWriter extends AbstractWriter {
           ServerSocket serverSocket = new ServerSocket(localPort);
           Socket socket = serverSocket.accept();
           PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+          socket.shutdownInput();
           return new TCPWriter(out, socket);
       };
     }
@@ -51,6 +52,7 @@ public class TCPWriter extends AbstractWriter {
         return () -> {
             Socket socket = new Socket(remoteHost, remotePort);
             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+            socket.shutdownInput();
             return new TCPWriter(out, socket);
         };
     }

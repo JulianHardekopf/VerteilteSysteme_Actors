@@ -60,6 +60,7 @@ public class TCPReader extends AbstractReader{
             ServerSocket server = new ServerSocket(localPort);
             Socket socket = server.accept();
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            socket.shutdownOutput();
             return new TCPReader(bufferedReader, socket);
         };
     }
@@ -67,6 +68,7 @@ public class TCPReader extends AbstractReader{
         return () -> {
             Socket socket = new Socket(remoteHost, remotePort);
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            socket.shutdownOutput();
             return new TCPReader(bufferedReader, socket);
 
         };

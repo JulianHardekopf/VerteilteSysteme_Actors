@@ -6,7 +6,7 @@ import tuple.Tuple;
 import java.io.BufferedReader;
 
 
-public abstract class AbstractReader implements Input {
+public class AbstractReader implements Input {
 
     private final BufferedReader reader;
     protected AbstractReader(BufferedReader reader) {
@@ -34,5 +34,10 @@ public abstract class AbstractReader implements Input {
         } catch (Exception e) {
             return Result.failure(e);
         }
+    }
+
+    @Override
+    public void close() throws Exception {
+
     }
 }

@@ -70,14 +70,9 @@ public class TCPReaderWriter implements InputOutput {
     }
 
     private static InputOutput getInputOutput(Socket socket) throws IOException {
-        AbstractReader in = new AbstractReader(new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
-            @Override
-            public void close() throws Exception {
-                socket.close();
-            }
-        };
-        AbstractWriter out = new AbstractWriter(new PrintWriter(socket.getOutputStream(), true));
-        return new TCPReaderWriter(socket, in, out);
+        TCPReader tcpReader = new TCPReader(new BufferedReader(new InputStreamReader(socket.getInputStream())), socket);
+        TCPWriter tcpWriter = new TCPWriter(new PrintWriter(socket.getOutputStream(), true), socket);
+        return new TCPReaderWriter(socket, tcpReader, tcpWriter);
     }
 
     public static Callable<InputOutput> connectTo(String remoteHost, int remotePort) {

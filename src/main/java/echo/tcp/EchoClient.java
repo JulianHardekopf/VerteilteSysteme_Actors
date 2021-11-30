@@ -15,7 +15,7 @@ public class EchoClient {
                 PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true))
         {
             String text = "Client schickt einen neuen String";
-            System.out.println("Sending to server:\n" + text);
+            System.out.println("Sending to server:" + text);
             out.println(text);
             String line;
             while ((line = br.readLine()) != null) {
