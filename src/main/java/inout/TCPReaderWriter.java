@@ -7,7 +7,6 @@ import tuple.Tuple;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import static inout.TCPReader.*;
 
 public class TCPReaderWriter implements InputOutput {
     private final Socket socket;
@@ -65,7 +64,6 @@ public class TCPReaderWriter implements InputOutput {
         return () -> {
             ServerSocket serverSocket = new ServerSocket(localPort);
             Socket socket = serverSocket.accept();
-
             return getInputOutput(socket);
         };
     }

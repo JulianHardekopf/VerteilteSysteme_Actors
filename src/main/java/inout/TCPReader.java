@@ -74,7 +74,7 @@ public class TCPReader extends AbstractReader{
 
         };
     }
-    static AbstractReader tcpReader(BufferedReader bufferedReader, Socket socket) {
+    static TCPReader tcpReader(BufferedReader bufferedReader, Socket socket) {
         return new TCPReader(bufferedReader, socket);
     }
 

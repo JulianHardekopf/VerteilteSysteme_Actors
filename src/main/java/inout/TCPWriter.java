@@ -54,7 +54,7 @@ public class TCPWriter extends AbstractWriter {
             return new TCPWriter(out, socket);
         };
     }
-    static AbstractWriter tcpWriter(PrintWriter printWriter, Socket socket) {
+    static TCPWriter tcpWriter(PrintWriter printWriter, Socket socket) {
         return new TCPWriter(printWriter, socket);
     }
 }
