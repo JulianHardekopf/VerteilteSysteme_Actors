@@ -1,7 +1,6 @@
 package inout;
 
 import fpinjava.Callable;
-
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
@@ -9,10 +8,9 @@ import java.net.Socket;
 
 public class TCPWriter extends AbstractWriter {
     private final Socket socket;
-    public TCPWriter(PrintWriter pw, Socket socket) {
+    private TCPWriter(PrintWriter pw, Socket socket) {
         super(pw);
         this.socket = socket;
-
     }
 
     @Override
@@ -55,5 +53,8 @@ public class TCPWriter extends AbstractWriter {
             socket.shutdownInput();
             return new TCPWriter(out, socket);
         };
+    }
+    static AbstractWriter tcpWriter(PrintWriter printWriter, Socket socket) {
+        return new TCPWriter(printWriter, socket);
     }
 }

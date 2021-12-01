@@ -10,11 +10,12 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.Buffer;
 
 public class TCPReader extends AbstractReader{
     private final Socket socket;
 
-    public TCPReader(BufferedReader reader, Socket socket) {
+    private TCPReader(BufferedReader reader, Socket socket) {
         super(reader);
         this.socket = socket;
     }
@@ -72,6 +73,9 @@ public class TCPReader extends AbstractReader{
             return new TCPReader(bufferedReader, socket);
 
         };
-
     }
+    static AbstractReader tcpReader(BufferedReader bufferedReader, Socket socket) {
+        return new TCPReader(bufferedReader, socket);
+    }
+
 }
