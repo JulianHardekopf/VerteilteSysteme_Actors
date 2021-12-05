@@ -51,4 +51,7 @@ public interface Input extends AutoCloseable {
             e.printStackTrace();
         }
     }
+
+
+    
 }
