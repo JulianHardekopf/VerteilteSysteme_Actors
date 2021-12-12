@@ -17,6 +17,7 @@ public class DaytimeClient {
         InputOutput udpReaderWriter = UDPSocket.udpReaderWriter(args[0], Integer.parseInt(args[1]));
         System.out.println((args[0] +  Integer.parseInt(args[1])));
         udpReaderWriter.printLine("Anfrage");
+
         System.out.println("anfrage durch");
         udpReaderWriter.readLine();
         System.out.println(udpReaderWriter.readLine());

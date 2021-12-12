@@ -4,11 +4,6 @@ import echo.udp.EchoClient;
 import fpinjava.Result;
 import tuple.Tuple;
 
-import javax.xml.crypto.Data;
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.*;
 
 public class UDPSocket implements InputOutput {
@@ -17,7 +12,6 @@ public class UDPSocket implements InputOutput {
     private final InetAddress address;
     private final int port;
     private static final int BUFSIZE = 1024;
-
     private boolean shutIn = false;
     private boolean shutOut = false;
 
@@ -35,16 +29,18 @@ public class UDPSocket implements InputOutput {
         socket.send(packetout);
     }
 
-    public String receive() throws Exception {
-        DatagramPacket packet = new DatagramPacket(new byte[BUFSIZE], BUFSIZE);
+    public String receive(int BUFSIZE) throws Exception {
+        byte[] payload = new byte[BUFSIZE];
+        DatagramPacket packet = new DatagramPacket(payload, payload.length);
         socket.receive(packet);
+        InetSocketAddress addr = new InetSocketAddress(packet.getAddress(), packet.getPort());
         return new String(packet.getData(), 0, packet.getLength());
     }
 
     @Override
     public Result<Tuple<String, Input>> readLine() {
         try {
-            String msg = receive();
+            String msg = receive(BUFSIZE);
             if (msg.equals(EOF)) {
                 shutdownInput();
                 return Result.empty();
@@ -125,8 +121,8 @@ public class UDPSocket implements InputOutput {
         InetAddress addr = InetAddress.getByName(remoteHost);
         // Datagramm zum Senden erhält IP und Port
         DatagramSocket datagramSocket = new DatagramSocket(remotePort, addr);
-        Output udpWriter =  new UDPSocket(datagramSocket, addr, remotePort);
-        ((UDPSocket) udpWriter).shutdownInput();
+        InputOutput udpWriter =  new UDPSocket(datagramSocket, addr, remotePort);
+        udpWriter.shutdownInput();
         return udpWriter;
     }
 

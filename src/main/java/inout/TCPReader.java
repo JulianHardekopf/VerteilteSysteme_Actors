@@ -55,7 +55,7 @@ public class TCPReader extends AbstractReader{
         socket.close();
     }
 
-    static Callable<Input> accept(int localPort) {
+    public static Callable<Input> accept(int localPort) {
 
         return () -> {
             ServerSocket server = new ServerSocket(localPort);
@@ -74,7 +74,7 @@ public class TCPReader extends AbstractReader{
 
         };
     }
-    static TCPReader tcpReader(BufferedReader bufferedReader, Socket socket) {
+    public static TCPReader tcpReader(BufferedReader bufferedReader, Socket socket) {
         return new TCPReader(bufferedReader, socket);
     }
 

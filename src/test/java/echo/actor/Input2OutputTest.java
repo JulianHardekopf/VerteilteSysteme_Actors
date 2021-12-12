@@ -9,7 +9,6 @@ import inout.ScriptReader;
 import inout.ScriptWriter;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import static echo.runnable.Input2Output.input2output;
 
 public  class Input2OutputTest {
 

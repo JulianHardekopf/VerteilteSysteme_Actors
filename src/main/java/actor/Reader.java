@@ -6,8 +6,8 @@ import inout.Input;
 public class Reader extends AbstractActor<String> {
     private final Input inputObject;
     private final String EOT = "\u0004";
-    private final Actor producer;
-    public Reader(String id, Type type, Input inputObject, Actor producer) {
+    private final Actor<String> producer;
+    public Reader(String id, Type type, Input inputObject, Actor<String> producer) {
         super(id, type);
         this.inputObject = inputObject;
         this.producer = producer;

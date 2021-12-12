@@ -46,7 +46,7 @@ public class TCPWriter extends AbstractWriter {
           return new TCPWriter(out, socket);
       };
     }
-    static Callable<Output> connectTo(String remoteHost, int remotePort) {
+    public static Callable<Output> connectTo(String remoteHost, int remotePort) {
         return () -> {
             Socket socket = new Socket(remoteHost, remotePort);
             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
@@ -54,7 +54,7 @@ public class TCPWriter extends AbstractWriter {
             return new TCPWriter(out, socket);
         };
     }
-    static TCPWriter tcpWriter(PrintWriter printWriter, Socket socket) {
+    public static TCPWriter tcpWriter(PrintWriter printWriter, Socket socket) {
         return new TCPWriter(printWriter, socket);
     }
 }
