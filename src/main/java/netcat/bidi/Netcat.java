@@ -2,6 +2,7 @@ package netcat.bidi;
 
 import actor.Actor;
 import actor.Writer;
+import fpinjava.Result;
 import inout.ConsoleReader;
 import inout.ConsoleWriter;
 import inout.InputOutput;
@@ -16,20 +17,21 @@ public class Netcat {
         if(args.length == 2) {
             InputOutput clientTcpReaderWriter = TCPReaderWriter.connectTo(args[0], Integer.parseInt(args[1])).call();
             Writer socketWriter = new Writer("socketWriter", Actor.Type.SERIAL,
-                    ConsoleReader.stdin(), clientTcpReaderWriter, producer);
-            Writer consoleWriter = new Writer("consolewriter", Actor.Type.SERIAL,
-                    clientTcpReaderWriter, ConsoleWriter.stdout(), producer);
-            socketWriter.start();
-            consoleWriter.start();
+                    clientTcpReaderWriter, clientTcpReaderWriter, producer);
+
+            Writer consoleWriter = new Writer("sever", Actor.Type.SERIAL,
+                    ConsoleReader.stdin(), ConsoleWriter.stdout(), producer);
+            socketWriter.start(Result.of(consoleWriter));
+            consoleWriter.start(Result.of(socketWriter));
 
         } else {
             InputOutput serverTcpReaderWriter = TCPReaderWriter.accept(Integer.parseInt(args[0])).call();
-            Writer socketWriter = new Writer("socketWriter", Actor.Type.SERIAL,
-                    ConsoleReader.stdin(), serverTcpReaderWriter, producer);
-            Writer consoleWriter = new Writer("sever", Actor.Type.SERIAL,
-                    serverTcpReaderWriter, ConsoleWriter.stdout(), producer);
-            socketWriter.start();
-            consoleWriter.start();
+            Writer socketWriter = new Writer("socketWriter", Actor.Type.SERIAL, serverTcpReaderWriter,
+                    serverTcpReaderWriter, producer);
+            Writer consoleWriter = new Writer("consolewriter", Actor.Type.SERIAL,
+                    ConsoleReader.stdin(), ConsoleWriter.stdout(), producer);
+            socketWriter.start(Result.of(consoleWriter));
+            consoleWriter.start(Result.of(socketWriter));
         }
     }
 }
