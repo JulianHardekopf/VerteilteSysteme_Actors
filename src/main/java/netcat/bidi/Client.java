@@ -11,13 +11,13 @@ public class Client {
         Result<Actor<String>> consumer = null;
         InputOutput tcpReaderWriter = TCPReaderWriter.connectTo(args[0], Integer.parseInt(args[1])).call();
         if(args.length == 2) {
-            // Zu viele TCPReaderWriter kann nur eine pro Klasse geben
-            Writer socketWriter = new Writer("socketWriter", Actor.Type.SERIAL, ConsoleReader.stdin(),
+
+            Writer socketWriter = new Writer("socketWriter", Actor.Type.SERIAL, tcpReaderWriter,
                     tcpReaderWriter, producer);
             Writer consoleWriter = new Writer("consolewriter", Actor.Type.SERIAL,
-                    tcpReaderWriter, ConsoleWriter.stdout(), producer);
-            socketWriter.start(Result.of(socketWriter));
-            consoleWriter.start(Result.of(consoleWriter));
+                    ConsoleReader.stdin(), ConsoleWriter.stdout(), producer);
+            socketWriter.start(Result.of(consoleWriter));
+            consoleWriter.start(Result.of(socketWriter));
 
         }
     }

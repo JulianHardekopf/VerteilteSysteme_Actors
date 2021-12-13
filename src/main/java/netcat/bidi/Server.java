@@ -17,11 +17,12 @@ public class Server {
         InputOutput tcpReaderWriter =  TCPReaderWriter.accept(Integer.parseInt(args[0])).call();
         if(args.length == 1) {
             Writer socketWriter = new Writer("socketWriter", Actor.Type.SERIAL,
-                    ConsoleReader.stdin(), tcpReaderWriter, producer);
-            socketWriter.start(Result.of(socketWriter));
+                    tcpReaderWriter, tcpReaderWriter, producer);
+
             Writer consoleWriter = new Writer("sever", Actor.Type.SERIAL,
-                    tcpReaderWriter, ConsoleWriter.stdout(), producer);
-            consoleWriter.start(Result.of(consoleWriter));
+                    ConsoleReader.stdin(), ConsoleWriter.stdout(), producer);
+            socketWriter.start(Result.of(consoleWriter));
+            consoleWriter.start(Result.of(socketWriter));
 
         }
     }
