@@ -12,7 +12,7 @@ import inout.TCPReaderWriter;
 public class Server {
     public static void main(String[] args) throws Exception {
         Actor<String> producer = null;
-        Result<Actor<String>> consumer = null;
+
 
         InputOutput tcpReaderWriter =  TCPReaderWriter.accept(Integer.parseInt(args[0])).call();
         if(args.length == 1) {

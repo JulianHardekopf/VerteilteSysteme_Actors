@@ -22,10 +22,9 @@ class BidiNetcatTest {
     //beim Netcat-Server die Ausgabe ablesen.
 
     @ParameterizedTest
-    @CsvSource({"'Hallo'",
-            "'HalloHallo'"})
-    public void test(String s) throws Exception {
-        String f = "test";
+    @CsvSource({"Hallo  , Test!"})
+    public void test(String s, String f) throws Exception {
+
 
         String[] commandServer = {"java", "-jar", "/home/julian/IdeaProjects/template/out/artifacts/BidiNetcat_jar2/praktikum.jar", "10006"};
         String[] commandClient = {"java", "-jar", "/home/julian/IdeaProjects/template/out/artifacts/BidiNetcat_jar2/praktikum.jar", "localhost", "10006"};
