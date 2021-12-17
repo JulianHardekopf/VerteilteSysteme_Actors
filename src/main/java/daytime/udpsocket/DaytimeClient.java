@@ -20,7 +20,7 @@ public class DaytimeClient {
 
         System.out.println((args[0] +  Integer.parseInt(args[1])));
         readerWriter.readLine();
-        System.out.println("jbb");
+
 
 
 
