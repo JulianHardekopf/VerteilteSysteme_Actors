@@ -12,7 +12,8 @@ public class EchoActor<T> extends AbstractActor<String> {
 
     public void onReceive(String message, Result<Actor<String>> sender) {
         // Empfängt eine Nachricht und sendet diese zurück zum Sender
-        sender.forEach(s -> s.tell(message, self()));
+        sender.forEach(s -> s.tell(message, sender));
+        System.err.println(message + "Hier im onReceive vom EchoActor");
 
     }
 

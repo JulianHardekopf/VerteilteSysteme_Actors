@@ -19,19 +19,13 @@ public class AskStream  {
         return tempActor.readLines();
 
     }
-    static Stream<String> ask(Writer transceiver, String message, long timeout) {
+    public static Stream<String> ask2(Writer transceiver, String message, long timeout) {
         ActorReader tempActor = new ActorReader(message, Actor.Type.SERIAL, timeout);
-        transceiver.start(Result.of(tempActor));
+        transceiver.start(tempActor.self());
         transceiver.tell(message, tempActor);
+        System.err.println(message + " " + transceiver.id + " In Ask2");
         return tempActor.readLines();
-    }
 
-    public static CompletableFuture<String> ask(Writer transceiver, String message) {
-
-        transceiver.start(Result.of(transceiver));
-        transceiver.tell(message, transceiver);
-        //IDK
-        return CompletableFuture.completedFuture(message);
     }
 
 }

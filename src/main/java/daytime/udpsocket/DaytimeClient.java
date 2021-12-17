@@ -1,6 +1,8 @@
 package daytime.udpsocket;
 
+import inout.Input;
 import inout.InputOutput;
+import inout.Output;
 import inout.UDPSocket;
 
 import java.net.DatagramPacket;
@@ -14,13 +16,14 @@ public class DaytimeClient {
         if (args.length != 2) {
             System.err.println("Usage: java DayTimeClient <host> <port>"); return;
         }
-        InputOutput udpReaderWriter = UDPSocket.udpReaderWriter(args[0], Integer.parseInt(args[1]));
-        System.out.println((args[0] +  Integer.parseInt(args[1])));
-        udpReaderWriter.printLine("Anfrage");
+        InputOutput readerWriter = UDPSocket.udpReaderWriter("localhost", 8880);
 
-        System.out.println("anfrage durch");
-        udpReaderWriter.readLine();
-        System.out.println(udpReaderWriter.readLine());
+        System.out.println((args[0] +  Integer.parseInt(args[1])));
+        readerWriter.readLine();
+
+
+
+
 
     }
 }

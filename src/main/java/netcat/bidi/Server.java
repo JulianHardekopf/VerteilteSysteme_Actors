@@ -1,7 +1,6 @@
 package netcat.bidi;
 
 import actor.Actor;
-import actor.Reader;
 import actor.Writer;
 import fpinjava.Result;
 import inout.ConsoleReader;

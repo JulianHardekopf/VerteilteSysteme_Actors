@@ -33,7 +33,6 @@ public class UDPSocket implements InputOutput {
         byte[] payload = new byte[BUFSIZE];
         DatagramPacket packet = new DatagramPacket(payload, payload.length);
         socket.receive(packet);
-        InetSocketAddress addr = new InetSocketAddress(packet.getAddress(), packet.getPort());
         return new String(packet.getData(), 0, packet.getLength());
     }
 
@@ -48,6 +47,7 @@ public class UDPSocket implements InputOutput {
                 return Result.success(new Tuple<>(msg, this));
             }
         } catch (Exception e) {
+            System.err.println("error in Readline");
             return Result.failure(e);
         }
     }
@@ -60,6 +60,7 @@ public class UDPSocket implements InputOutput {
             System.err.println(e);
         }
     }
+
 
     @Override
     public void print(String s) {
@@ -83,7 +84,7 @@ public class UDPSocket implements InputOutput {
     @Override
     public void shutdownOutput() {
         try {
-            send(EOF);
+
             if (isInputShutdown()) {
                 socket.close();
             } else {
@@ -96,11 +97,11 @@ public class UDPSocket implements InputOutput {
     }
 
     public boolean isInputShutdown() {
-        return shutIn;
+        return shutIn = true;
     }
 
     public boolean isOutputShutdown() {
-        return shutOut;
+        return shutOut = true;
     }
 
     @Override
@@ -108,7 +109,7 @@ public class UDPSocket implements InputOutput {
         socket.close();
     }
 
-    static Input udpReader(int localPort) throws SocketException, UnknownHostException {
+    public static Input udpReader(int localPort) throws SocketException, UnknownHostException {
         // Datagram zum Empfangen erhält ein Byte-Array
         DatagramSocket datagramSocket = new DatagramSocket(BUFSIZE);
         InetAddress addr = InetAddress.getByName("localhost");
@@ -117,7 +118,7 @@ public class UDPSocket implements InputOutput {
         return udpReader;
     }
 
-    static Output udpWriter(String remoteHost, int remotePort) throws UnknownHostException, SocketException {
+    public static Output udpWriter(String remoteHost, int remotePort) throws UnknownHostException, SocketException {
         InetAddress addr = InetAddress.getByName(remoteHost);
         // Datagramm zum Senden erhält IP und Port
         DatagramSocket datagramSocket = new DatagramSocket(remotePort, addr);

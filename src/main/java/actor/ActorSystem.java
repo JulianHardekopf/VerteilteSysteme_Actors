@@ -1,8 +1,7 @@
 package actor;
 
 import fpinjava.Callable;
-import fpinjava.Result;
-import inout.TCPReader;
+import inout.InputOutput;
 import inout.TCPReaderWriter;
 
 public class ActorSystem {
@@ -10,10 +9,12 @@ public class ActorSystem {
 
     public static Runnable publish2one(Actor<String> actor, int port) throws Exception {
         return () -> {
-        Actor<String> producer = null;
+            //Actor<String> producer = new ActorReader("producer", Actor.Type.SERIAL, 10000);
             try {
-                Writer publizierterActor = new Writer("publizierterActor", Actor.Type.SERIAL, TCPReaderWriter.accept(port).call(), TCPReaderWriter.accept(port).call(), producer);
-                publizierterActor.start();
+                InputOutput readerWriter = TCPReaderWriter.accept(port).call();
+                Writer publizierterActor = new Writer("publizierterActor", Actor.Type.SERIAL, readerWriter, readerWriter, actor);
+                publizierterActor.start(actor.self());
+
             } catch (Exception e) {
                 System.err.println(e);
             }
@@ -22,15 +23,13 @@ public class ActorSystem {
 
     public static Callable<Writer> actorSelection(String host, int port) {
         return () -> {
-            Actor<String> producer = null;
-            try {
-                Writer entfernterActor = new Writer("entfernterActor", Actor.Type.SERIAL, TCPReaderWriter.connectTo(host, port).call(), TCPReaderWriter.connectTo(host, port).call(), producer);
-                entfernterActor.start();
-                return entfernterActor;
-            } catch (Exception e) {
-                System.err.println(e);
-                return null;
-            }
+            Actor<String> producer = new ActorReader("producer", Actor.Type.SERIAL, 10000);
+
+                InputOutput readerWriter = TCPReaderWriter.connectTo(host, port).call();
+                Writer writer = new Writer("entfernterActor", Actor.Type.SERIAL, readerWriter, readerWriter, producer);
+
+                return writer;
         };
     }
+
 }

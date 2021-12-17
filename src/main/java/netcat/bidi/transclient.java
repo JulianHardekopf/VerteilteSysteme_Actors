@@ -8,7 +8,7 @@ import inout.ConsoleReader;
 import inout.ConsoleWriter;
 
 
-public class Transceiver {
+public class transclient {
 
     public static void main(String[] args) throws Exception {
         Actor<String> producer = null;

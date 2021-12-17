@@ -8,7 +8,7 @@ import inout.ConsoleReader;
 import inout.ConsoleWriter;
 
 
-public class Transceiver {
+public class transserver {
 
     public static void main(String[] args) throws Exception {
         Actor<String> producer = null;
@@ -24,7 +24,7 @@ public class Transceiver {
             consoleWriter.start();
 
         } else {
-            Runnable transceiverServer = ActorSystem.publish2one(producer, Integer.parseInt(args[1]));
+            Runnable transceiverServer = ActorSystem.publish2one(producer, Integer.parseInt(args[0]));
             Writer consoleWriter = new Writer("consolewriter", Actor.Type.SERIAL,
                     ConsoleReader.stdin(), ConsoleWriter.stdout(), producer);
             transceiverServer.run();

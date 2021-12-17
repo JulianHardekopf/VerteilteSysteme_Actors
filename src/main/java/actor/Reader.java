@@ -13,13 +13,24 @@ public class Reader extends AbstractActor<String> {
         this.producer = producer;
     }
 
-
+    /*
     @Override
     public void onReceive(String message, Result<Actor<String>> sender) {
         //Textzeilen werden als Stream verarbeitet und an den Writer übergeben
         inputObject.readLines().forEach(s -> sender.forEach(stringActor -> stringActor.tell(s)));
         // Bei erfolgreichen einlesen wird dem Writer am ende EOT mitgeteilt
         sender.forEach(a -> a.tell(EOT, self()));
+    } */
+
+    // Änderung für Transceiver -> sendet kein EOT zeichen
+    @Override
+    public void onReceive(String message, Result<Actor<String>> sender) {
+        inputObject.readLines().forEach(s -> sender.forEach(ac -> ac.tell(message, sender)));
+        System.err.println("onReceive vom Reader");
+    }
+
+    public static Reader createReader(String id, Type type, Input input, Actor<String> actor) {
+        return new Reader(id, type, input, actor);
     }
 
 }

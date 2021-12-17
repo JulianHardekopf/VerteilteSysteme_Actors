@@ -8,10 +8,10 @@ import tuple.Tuple;
 public class ActorReaderWriter extends AbstractActor<String> implements InputOutput {
     private  final ActorReader actorReader;
     private  final Actor<String> actor;
-    public ActorReaderWriter(String id, Actor<String> actor, long timeout, ActorReader actorReader, Actor<String> actor1) {
+    public ActorReaderWriter(String id, Actor<String> actor, long timeout) {
         super(id, Type.SERIAL);
-        this.actorReader = actorReader;
-        this.actor = actor1;
+        this.actor = actor;
+        actorReader = new ActorReader("actorreader", Type.SERIAL, 10000);
     }
 
     @Override
@@ -26,13 +26,18 @@ public class ActorReaderWriter extends AbstractActor<String> implements InputOut
 
     }
 
+
     @Override
     public void print(String s) {
         actor.tell(s ,self());
     }
-    static ActorReaderWriter actorReaderWriter(String id, Actor<String> actor, long timeout, ActorReader actorReader, Actor<String> actor1) {
-        return new ActorReaderWriter(id, actor, timeout, actorReader, actor1);
+    /*
+    static ActorReaderWriter actorReaderWriter(String id, Actor<String> actor, long timeout, ActorReader actorReader) {
+        return new ActorReaderWriter(id, actor, timeout, actorReader);
     }
+
+
+     */
     @Override
     public void close() throws Exception {
 
