@@ -16,7 +16,7 @@ public class DaytimeClient {
         if (args.length != 2) {
             System.err.println("Usage: java DayTimeClient <host> <port>"); return;
         }
-        InputOutput readerWriter = UDPSocket.udpReaderWriter("localhost", 8880);
+        InputOutput readerWriter = UDPSocket.udpReaderWriter(args[0], Integer.parseInt(args[1]));
 
         System.out.println((args[0] +  Integer.parseInt(args[1])));
         readerWriter.readLine();

@@ -16,7 +16,7 @@ public class DaytimeServer {
     public static void main(String[] args) throws Exception {
 
         while (true) {
-            InputOutput readerWriter = UDPSocket.udpReaderWriter(7777);
+            InputOutput readerWriter = UDPSocket.udpReaderWriter(args[0], Integer.parseInt(args[1]));
 
             // Woher kriegt der Server adresse und port vom Client?
             readerWriter.printLine(time);
