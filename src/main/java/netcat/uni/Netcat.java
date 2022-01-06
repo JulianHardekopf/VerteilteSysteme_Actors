@@ -23,11 +23,13 @@ public class Netcat {
 
         Actor<String> producer = null;
         if(args.length == 2) {
-            Writer clientWriter = new Writer("netcatclient", Actor.Type.SERIAL, ConsoleReader.stdin(), TCPWriter.connectTo(args[0], Integer.parseInt(args[1])).call(), producer);
+            Writer clientWriter = new Writer("netcatclient", Actor.Type.SERIAL, ConsoleReader.stdin(),
+                    TCPWriter.connectTo(args[0], Integer.parseInt(args[1])).call());
             clientWriter.start();
 
         } if(args.length == 1) {
-            Writer serverReader = new Writer("netcatserver", Actor.Type.SERIAL, TCPReader.accept(Integer.parseInt(args[0])).call(), ConsoleWriter.stdout(), producer);
+            Writer serverReader = new Writer("netcatserver", Actor.Type.SERIAL,
+                    TCPReader.accept(Integer.parseInt(args[0])).call(), ConsoleWriter.stdout());
             serverReader.start();
 
         }

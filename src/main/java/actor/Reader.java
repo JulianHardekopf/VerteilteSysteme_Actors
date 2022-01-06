@@ -28,8 +28,8 @@ public class Reader extends AbstractActor<String> {
         inputObject.readLines().forEach(s -> sender.forEach(ac -> ac.tell(s, producer)));
     }
 
-    public static Reader createReader(String id, Type type, Input input, Actor<String> actor) {
-        return new Reader(id, type, input, actor);
+    public static Reader createReader(String id, Type type, Input input, Actor<String> producer) {
+        return new Reader(id, type, input, producer);
     }
 
 }

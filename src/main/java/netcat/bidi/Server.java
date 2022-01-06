@@ -10,16 +10,14 @@ import inout.TCPReaderWriter;
 
 public class Server {
     public static void main(String[] args) throws Exception {
-        Actor<String> producer = null;
-
 
         InputOutput tcpReaderWriter =  TCPReaderWriter.accept(Integer.parseInt(args[0])).call();
         if(args.length == 1) {
             Writer socketWriter = new Writer("socketWriter", Actor.Type.SERIAL,
-                    tcpReaderWriter, tcpReaderWriter, producer);
+                    tcpReaderWriter, tcpReaderWriter);
 
             Writer consoleWriter = new Writer("sever", Actor.Type.SERIAL,
-                    ConsoleReader.stdin(), ConsoleWriter.stdout(), producer);
+                    ConsoleReader.stdin(), ConsoleWriter.stdout());
             socketWriter.start(Result.of(consoleWriter));
             consoleWriter.start(Result.of(socketWriter));
 

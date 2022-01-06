@@ -12,7 +12,7 @@ public class DaytimeActor<T> extends AbstractActor<String> {
     }
     @Override
     public void onReceive(String message, Result<Actor<String>> sender) {
-        sender.forEach(s -> s.tell(message + (LocalDateTime.now()), sender));
+        sender.forEach(s -> s.tell(message + (LocalDateTime.now()), this));
     }
 
 }

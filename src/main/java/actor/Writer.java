@@ -10,16 +10,14 @@ public class Writer extends AbstractActor<String> {
     private final Output outputObject;
     private final Reader reader;
     private final String EOT = "\u0004";
-    private final Actor<String > producer;
 
 
 
-    public Writer(String id, Type type, Input inputObject, Output outputObject, Actor<String> producer) {
+    public Writer(String id, Type type, Input inputObject, Output outputObject) {
         super(id, type);
         this.inputObject = inputObject;
         this.outputObject = outputObject;
-        this.producer = this;
-        reader = Reader.createReader("reader", Type.SERIAL,  inputObject , producer);
+        reader = Reader.createReader("reader", Type.SERIAL,  inputObject , this);
 
     }
 
