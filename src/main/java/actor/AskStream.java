@@ -19,11 +19,13 @@ public class AskStream  {
         return tempActor.readLines();
 
     }
-    public static Stream<String> ask2(Writer transceiver, String message, long timeout) {
-        ActorReader tempActor = new ActorReader(message, Actor.Type.SERIAL, timeout);
+    public static Stream<String> ask(Writer transceiver, String message, long timeout) {
+        ActorReaderWriter tempActor = new ActorReaderWriter(message, transceiver, timeout);
         transceiver.start(tempActor.self());
-        transceiver.tell(message, tempActor);
-        System.err.println(message + " " + transceiver.id + " In Ask2");
+        // Stellt request nicht an Echo sondern TCP Transceiver
+        // transceiver.tell(message, tempActor);
+        tempActor.print(message);
+
         return tempActor.readLines();
 
     }

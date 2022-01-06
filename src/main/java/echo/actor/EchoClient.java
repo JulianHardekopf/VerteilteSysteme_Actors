@@ -12,9 +12,8 @@ public class EchoClient {
     public static void main(String[] args) throws Exception {
 
         Writer writer = ActorSystem.actorSelection(args[0], Integer.parseInt(args[1])).call();
-        Stream<String> stream = AskStream.ask2(writer, "ECHO", 10000);
+        Stream<String> stream = AskStream.ask(writer, "ECHO", 1000);
         ConsoleWriter consoleWriter = ConsoleWriter.stdout();
-        stream.forEach(System.out::println);
         consoleWriter.printLine(stream.head());
 
     }

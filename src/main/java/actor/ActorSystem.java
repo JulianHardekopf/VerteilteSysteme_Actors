@@ -7,7 +7,7 @@ import inout.TCPReaderWriter;
 public class ActorSystem {
 
 
-    public static Runnable publish2one(Actor<String> actor, int port) throws Exception {
+    public static Runnable publish2one(Actor<String> actor, int port) {
         return () -> {
             //Actor<String> producer = new ActorReader("producer", Actor.Type.SERIAL, 10000);
             try {
@@ -26,8 +26,8 @@ public class ActorSystem {
             Actor<String> producer = new ActorReader("producer", Actor.Type.SERIAL, 10000);
 
                 InputOutput readerWriter = TCPReaderWriter.connectTo(host, port).call();
-                Writer writer = new Writer("entfernterActor", Actor.Type.SERIAL, readerWriter, readerWriter, producer);
-
+                Writer writer = new Writer("entfernterActorClient", Actor.Type.SERIAL, readerWriter, readerWriter, producer);
+                // writer.start(producer.self());
                 return writer;
         };
     }

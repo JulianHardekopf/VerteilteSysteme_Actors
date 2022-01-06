@@ -18,7 +18,7 @@ public class Writer extends AbstractActor<String> {
         super(id, type);
         this.inputObject = inputObject;
         this.outputObject = outputObject;
-        this.producer = producer;
+        this.producer = this;
         reader = Reader.createReader("reader", Type.SERIAL,  inputObject , producer);
 
     }
@@ -41,12 +41,11 @@ public class Writer extends AbstractActor<String> {
     public void onReceive(String message, Result<Actor<String>> sender) {
 
         if(message.equals(EOT)) {
-            System.err.println("EOT erreicht (Writer)");
             outputObject.printLine(EOT);
             outputObject.shutdownOutput();
         } else {
             outputObject.printLine(message);
-            System.err.println(message + "Message + wird geprinted im (Writer)");
+
         }
 
     }

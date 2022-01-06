@@ -9,5 +9,6 @@ public class EchoServer {
         EchoActor<String> echoActor = new EchoActor<>("echoActor", Actor.Type.SERIAL);
         ActorSystem.publish2one(echoActor, Integer.parseInt(args[0])).run();
 
+
     }
 }

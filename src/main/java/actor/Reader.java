@@ -25,8 +25,7 @@ public class Reader extends AbstractActor<String> {
     // Änderung für Transceiver -> sendet kein EOT zeichen
     @Override
     public void onReceive(String message, Result<Actor<String>> sender) {
-        inputObject.readLines().forEach(s -> sender.forEach(ac -> ac.tell(message, sender)));
-        System.err.println("onReceive vom Reader");
+        inputObject.readLines().forEach(s -> sender.forEach(ac -> ac.tell(s, producer)));
     }
 
     public static Reader createReader(String id, Type type, Input input, Actor<String> actor) {

@@ -6,12 +6,12 @@ import tuple.Tuple;
 
 
 public class ActorReaderWriter extends AbstractActor<String> implements InputOutput {
-    private  final ActorReader actorReader;
-    private  final Actor<String> actor;
-    public ActorReaderWriter(String id, Actor<String> actor, long timeout) {
+    private final ActorReader actorReader;
+    private final Actor<String> actor;
+    public ActorReaderWriter(String id, Actor<String> actor,  long timeout) {
         super(id, Type.SERIAL);
         this.actor = actor;
-        actorReader = new ActorReader("actorreader", Type.SERIAL, 10000);
+        actorReader = new ActorReader("actorreader", Type.SERIAL, 1000);
     }
 
     @Override
