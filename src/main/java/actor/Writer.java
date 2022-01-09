@@ -54,6 +54,7 @@ public class Writer extends AbstractActor<String> {
         reader.tell("", self());
     }
     public void start(Result<Actor<String>> consumer) {
+
         reader.tell("", consumer);
     }
 }

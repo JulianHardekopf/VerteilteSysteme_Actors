@@ -25,8 +25,8 @@ public class DistEchoActorTest {
                 "'HalloHallo'"})
         public void test(String s) throws Exception {
 
-            String[] commandServer = {"java", "jar", "C:\\Users\\julian\\IdeaProjects\\template\\out\\artifacts\\EchoServer_jar\\praktikum.jar", "8111"};
-            String[] commandClient = {"java", "jar", "C:\\Users\\julian\\IdeaProjects\\template\\out\\artifacts\\EchoClient_jar\\praktikum.jar", "localhost", "8111", s};
+            String[] commandServer = {"java", "jar", "C:\\Users\\julian\\IdeaProjects\\template\\out\\artifacts\\EchoTransceiver_jar\\praktikum.jar", "8111"};
+            String[] commandClient = {"java", "jar", "C:\\Users\\julian\\IdeaProjects\\template\\out\\artifacts\\EchoTransceiver_jar\\praktikum.jar", "localhost", "8111", s};
             ProcessBuilder processBuilderServer = new ProcessBuilder(commandServer);
             ProcessBuilder processBuilderClient = new ProcessBuilder(commandClient);
             Process processServer = processBuilderServer.start();
@@ -38,14 +38,15 @@ public class DistEchoActorTest {
             BufferedReader clientInput = new BufferedReader(new InputStreamReader(processClient.getInputStream()));
             BufferedWriter clientOutput = new BufferedWriter(new OutputStreamWriter(processClient.getOutputStream()));
 
-            /*
+
             clientOutput.write(s);
             clientOutput.flush();
             clientOutput.close();
-
             serverInput.readLine();
-            */
-            clientOutput.write(s);
+            serverOutput.write(s);
+
+
+
             String compare = clientInput.readLine();
             processClient.destroy();
             processServer.destroy();

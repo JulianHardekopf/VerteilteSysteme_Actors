@@ -5,6 +5,9 @@ import fpinjava.Result;
 import inout.InputOutput;
 import inout.TCPReaderWriter;
 
+import java.net.ServerSocket;
+import java.net.Socket;
+
 public class ActorSystem {
 
 
@@ -24,10 +27,26 @@ public class ActorSystem {
 
     public static Callable<Writer> actorSelection(String host, int port) {
         return () -> {
-            Actor<String> producer = new ActorReader("producer", Actor.Type.SERIAL, 10000);
+
             InputOutput readerWriter = TCPReaderWriter.connectTo(host, port).call();
             return new Writer("entfernterActorClient", Actor.Type.SERIAL, readerWriter, readerWriter);
         };
     }
 
+    public static Runnable publish2multiple(Actor<String> actor, int port) {
+        return () -> {
+
+                while (true) {
+                    InputOutput slave = null;
+                    try {
+                        slave = TCPReaderWriter.accept(port).call();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    new Writer("Slave", Actor.Type.SERIAL, slave ,slave).start(actor.self());
+
+            }
+        };
+
+    }
 }
