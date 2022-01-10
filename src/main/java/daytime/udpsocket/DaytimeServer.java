@@ -15,11 +15,11 @@ public class DaytimeServer {
 
     public static void main(String[] args) throws Exception {
 
-        while (true) {
-            InputOutput readerWriter = UDPSocket.udpReaderWriter(args[0], Integer.parseInt(args[1]));
 
-            // Woher kriegt der Server adresse und port vom Client?
+            InputOutput readerWriter = UDPSocket.udpReaderWriterServer(Integer.parseInt(args[0]));
+            readerWriter.printLine("gwef");
+            readerWriter.readLine();
             readerWriter.printLine(time);
-        }
+
     }
 }

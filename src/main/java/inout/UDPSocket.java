@@ -15,7 +15,7 @@ public class UDPSocket implements InputOutput {
     private boolean shutIn = false;
     private boolean shutOut = false;
 
-    private UDPSocket(DatagramSocket socket, InetAddress address, int port) {
+    private UDPSocket(DatagramSocket socket, InetAddress address, int port) throws UnknownHostException {
         this.socket = socket;
         this.address = address;
         this.port = port;
@@ -24,24 +24,31 @@ public class UDPSocket implements InputOutput {
 
 
     public void send(String s) throws Exception {
-        byte[] sende = s.getBytes();
+        byte[] sende = s.getBytes("utf-8");
         DatagramPacket packetout = new DatagramPacket(sende, sende.length, address, port);
         socket.send(packetout);
     }
 
-    public String receive(int BUFSIZE) throws Exception {
-        byte[] payload = new byte[BUFSIZE];
-        DatagramPacket packet = new DatagramPacket(payload, payload.length);
-        socket.receive(packet);
-        return new String(packet.getData(), 0, packet.getLength());
+    public String receive() throws Exception {
+        String msg;
+        DatagramPacket packet = new DatagramPacket(new byte[BUFSIZE], BUFSIZE);
+        try {
+            socket.receive(packet);
+            msg = new String(packet.getData(), 0, packet.getLength(), "utf-8");
+        } catch (Exception e) {
+            System.err.println(e);
+            msg = null;
+        }
+
+        return msg;
     }
 
     @Override
     public Result<Tuple<String, Input>> readLine() {
         try {
-            String msg = receive(BUFSIZE);
+            String msg = receive();
             if (msg.equals(EOF)) {
-                shutdownInput();
+                //shutdownInput();
                 return Result.empty();
             } else {
                 return Result.success(new Tuple<>(msg, this));
@@ -57,7 +64,7 @@ public class UDPSocket implements InputOutput {
         try {
             send(s);
         } catch (Exception e) {
-            System.err.println(e);
+            System.err.println("Printline geht nicht");
         }
     }
 
@@ -135,5 +142,15 @@ public class UDPSocket implements InputOutput {
     public static InputOutput udpReaderWriter(String remoteHost, int remotePort) throws SocketException, UnknownHostException {
         DatagramSocket socket = new DatagramSocket();
         return new UDPSocket(socket, InetAddress.getByName(remoteHost), remotePort);
+    }
+    public static InputOutput udpReaderWriterServer(int localPort) throws SocketException, UnknownHostException {
+        DatagramSocket datagramSocket = new DatagramSocket();
+        InetAddress addr = InetAddress.getByName("localhost");
+        return new UDPSocket(datagramSocket, addr, localPort);
+    }
+    public static InputOutput udpReaderWriterClient(String remotehost, int remoteport) throws SocketException, UnknownHostException {
+        DatagramSocket datagramSocket = new DatagramSocket(remoteport);
+        InetAddress addr = InetAddress.getByName(remotehost);
+        return new UDPSocket(datagramSocket, addr, remoteport);
     }
 }
