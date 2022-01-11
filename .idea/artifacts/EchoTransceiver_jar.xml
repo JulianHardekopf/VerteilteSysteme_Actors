@@ -1,0 +1,9 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="EchoTransceiver:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/EchoTransceiver_jar</output-path>
+    <root id="archive" name="praktikum.jar">
+      <element id="module-output" name="praktikum" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/parboiled/parboiled-core/1.1.4/parboiled-core-1.1.4.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>
