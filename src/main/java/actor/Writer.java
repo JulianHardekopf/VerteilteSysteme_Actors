@@ -2,7 +2,9 @@ package actor;
 
 import fpinjava.Result;
 import inout.Input;
+import inout.InputOutput;
 import inout.Output;
+import inout.TCPReaderWriter;
 
 
 public class Writer extends AbstractActor<String> {
@@ -10,6 +12,7 @@ public class Writer extends AbstractActor<String> {
     private final Output outputObject;
     private final Reader reader;
     private final String EOT = "\u0004";
+    private static boolean isTransceiver = false;
 
 
 
@@ -37,11 +40,16 @@ public class Writer extends AbstractActor<String> {
     // Änderung für den Transceiver -> EOT wird auf dem Output geschrieben und dann geschlossen.
     @Override
     public void onReceive(String message, Result<Actor<String>> sender) {
+        if(!isTransceiver && message.equals(EOT)) {
+            outputObject.shutdownOutput();
+        } if(!isTransceiver) {
+            outputObject.printLine(message);
+        }
 
-        if(message.equals(EOT)) {
+        if(isTransceiver && message.equals(EOT)) {
             outputObject.printLine(EOT);
             outputObject.shutdownOutput();
-        } else {
+        } if(isTransceiver) {
             outputObject.printLine(message);
 
         }
@@ -57,4 +65,9 @@ public class Writer extends AbstractActor<String> {
 
         reader.tell("", consumer);
     }
+    public static Writer transceiver(Input in, Output out) throws Exception {
+        isTransceiver = true;
+        return new Writer("Transceiver", Type.SERIAL, in, out);
+    }
+
 }

@@ -13,11 +13,10 @@ public class ActorSystem {
 
     public static Runnable publish2one(Actor<String> actor, int port) {
         return () -> {
-
             try {
                 InputOutput readerWriter = TCPReaderWriter.accept(port).call();
-                Writer publizierterActor = new Writer("publizierterActor", Actor.Type.SERIAL, readerWriter, readerWriter);
-                publizierterActor.start(actor.self());
+                Writer transceiver = Writer.transceiver(readerWriter, readerWriter);
+                transceiver.start(actor.self());
 
             } catch (Exception e) {
                 System.err.println(e);
@@ -27,9 +26,8 @@ public class ActorSystem {
 
     public static Callable<Writer> actorSelection(String host, int port) {
         return () -> {
-
             InputOutput readerWriter = TCPReaderWriter.connectTo(host, port).call();
-            return new Writer("entfernterActorClient", Actor.Type.SERIAL, readerWriter, readerWriter);
+            return Writer.transceiver(readerWriter, readerWriter);
         };
     }
 

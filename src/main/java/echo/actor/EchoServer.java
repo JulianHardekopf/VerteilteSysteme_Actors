@@ -7,7 +7,7 @@ public class EchoServer {
 
     public static void main(String[] args) throws Exception {
         EchoActor<String> echoActor = new EchoActor<>("echoActor", Actor.Type.SERIAL);
-        ActorSystem.publish2multiple(echoActor, Integer.parseInt(args[0])).run();
+        ActorSystem.publish2one(echoActor, Integer.parseInt(args[0])).run();
 
 
     }

@@ -20,7 +20,7 @@ public class DaytimeClient {
         readerWriter.printLine("test");
 
         readerWriter.readLine();
-        System.out.println(readerWriter.readLine());
+
 
 
     }

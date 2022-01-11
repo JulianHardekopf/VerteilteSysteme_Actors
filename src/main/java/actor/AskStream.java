@@ -22,10 +22,7 @@ public class AskStream  {
     public static Stream<String> ask(Writer transceiver, String message, long timeout) {
         ActorReaderWriter tempActor = new ActorReaderWriter(message, transceiver, timeout);
         transceiver.start(tempActor.self());
-        // Stellt request nicht an Echo sondern TCP Transceiver
-        // transceiver.tell(message, tempActor);
-        tempActor.print(message);
-
+        transceiver.tell(message, tempActor);
         return tempActor.readLines();
 
     }
