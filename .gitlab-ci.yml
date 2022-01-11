@@ -24,6 +24,11 @@ EchoActor:
   script:
     - mvn -Dtest=echo.actor.EchoActorTest test
 
+DistEchoActorTest:
+  stage: test
+  script:
+    - mvn -Dtest=echo.actor.DistEchoActorTest test
+
 In2OutActor:
   stage: test
   script:
@@ -50,10 +55,6 @@ BidiNetcat:
     - mvn -Dtest=netcat.bidi.tcp.BidiNetcatTest test
 
 
-DistEchoActorTest:
-  stage: test
-  script:
-    - mvn -Dtest=echo.actor.DistEchoActorTest test
 
 deploy-prod:
   stage: deploy
