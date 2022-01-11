@@ -48,7 +48,8 @@ BidiNetcat:
   stage: test
   script:
     - mvn -Dtest=netcat.bidi.tcp.BidiNetcatTest test
-    -
+
+
 DistEchoActorTest:
   stage: test
   script:
