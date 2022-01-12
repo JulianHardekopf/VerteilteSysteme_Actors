@@ -60,14 +60,12 @@ public class Writer extends AbstractActor<String> {
     public void start() {
         // Erzeugter Reader ruft bei Start die Tell Methode auf mit einem leeren String
         // und gibt als Referenz den Writer auf
-        isTransceiver = false;
         reader.tell("", self());
     }
     public void start(Result<Actor<String>> consumer) {
-
         reader.tell("", consumer);
     }
-    public static Writer transceiver(Input in, Output out) throws Exception {
+    public static Writer transceiver(Input in, Output out) {
         isTransceiver = true;
         return new Writer("Transceiver", Type.SERIAL, in, out);
     }

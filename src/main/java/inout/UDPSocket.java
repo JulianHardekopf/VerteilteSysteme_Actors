@@ -2,6 +2,7 @@ package inout;
 
 import echo.udp.EchoClient;
 import fpinjava.Result;
+import stream.Stream;
 import tuple.Tuple;
 
 import java.net.*;
@@ -39,16 +40,16 @@ public class UDPSocket implements InputOutput {
             System.err.println(e);
             msg = null;
         }
-
         return msg;
     }
+
 
     @Override
     public Result<Tuple<String, Input>> readLine() {
         try {
             String msg = receive();
             if (msg.equals(EOF)) {
-                //shutdownInput();
+                shutdownInput();
                 return Result.empty();
             } else {
                 return Result.success(new Tuple<>(msg, this));
@@ -57,6 +58,11 @@ public class UDPSocket implements InputOutput {
             System.err.println("error in Readline");
             return Result.failure(e);
         }
+    }
+
+    @Override
+    public Stream<String> readLines() {
+        return InputOutput.super.readLines();
     }
 
     @Override
@@ -91,7 +97,6 @@ public class UDPSocket implements InputOutput {
     @Override
     public void shutdownOutput() {
         try {
-
             if (isInputShutdown()) {
                 socket.close();
             } else {
@@ -134,15 +139,6 @@ public class UDPSocket implements InputOutput {
         return udpWriter;
     }
 
-    public static InputOutput udpReaderWriter(int localPort) throws SocketException, UnknownHostException {
-        DatagramSocket socket = new DatagramSocket(localPort);
-        InetAddress addr = InetAddress.getByName("localhost");
-        return new UDPSocket(socket, addr, localPort);
-    }
-    public static InputOutput udpReaderWriter(String remoteHost, int remotePort) throws SocketException, UnknownHostException {
-        DatagramSocket socket = new DatagramSocket();
-        return new UDPSocket(socket, InetAddress.getByName(remoteHost), remotePort);
-    }
     public static InputOutput udpReaderWriterServer(int localPort) throws SocketException, UnknownHostException {
         DatagramSocket datagramSocket = new DatagramSocket();
         InetAddress addr = InetAddress.getByName("localhost");

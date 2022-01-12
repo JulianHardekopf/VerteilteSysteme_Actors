@@ -22,8 +22,8 @@ public class DistEchoActorTest {
 
         String path = System.getProperty("java.class.path");
 
-        ProcessBuilder echoSever = new ProcessBuilder("java","-cp", path, "echo.actor.EchoServer", "8111");
-        Process processServer =  echoSever.start();
+        ProcessBuilder echoServer = new ProcessBuilder("java","-cp", path, "echo.actor.EchoServer", "8111");
+        Process processServer =  echoServer.start();
 
 
         ProcessBuilder echoClient = new ProcessBuilder("java", "-cp", path, "echo.actor.EchoClient", "localhost", "8111", s);
