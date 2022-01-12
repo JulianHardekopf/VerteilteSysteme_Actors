@@ -49,6 +49,7 @@ public class Writer extends AbstractActor<String> {
         if(isTransceiver && message.equals(EOT)) {
             outputObject.printLine(EOT);
             outputObject.shutdownOutput();
+
         } if(isTransceiver) {
             outputObject.printLine(message);
 
@@ -62,7 +63,7 @@ public class Writer extends AbstractActor<String> {
         reader.tell("", self());
     }
     public void start(Result<Actor<String>> consumer) {
-
+        isTransceiver = false;
         reader.tell("", consumer);
     }
     public static Writer transceiver(Input in, Output out) throws Exception {
