@@ -2,7 +2,6 @@ package actor;
 
 import fpinjava.Result;
 import inout.Input;
-import inout.InputOutput;
 import inout.Output;
 import inout.TCPReaderWriter;
 
@@ -12,47 +11,32 @@ public class Writer extends AbstractActor<String> {
     private final Output outputObject;
     private final Reader reader;
     private final String EOT = "\u0004";
-    private static boolean isTransceiver = false;
+    private final boolean isTransceiver;
 
 
 
-    public Writer(String id, Type type, Input inputObject, Output outputObject) {
+    public Writer(String id, Type type, Input inputObject, Output outputObject, boolean isTransceiver) {
         super(id, type);
         this.inputObject = inputObject;
         this.outputObject = outputObject;
-        reader = Reader.createReader("reader", Type.SERIAL,  inputObject , this);
-
+        if(!isTransceiver) {
+            reader = Reader.createReader("reader", Type.SERIAL,  inputObject , this);
+        } else {
+            reader = Reader.transceiver(inputObject, this);
+        }
+        this.isTransceiver = isTransceiver;
     }
 
-    /*
-    @Override
-    public void onReceive(String message, Result<Actor<String>> sender) {
-        // Writer schreibt jede Empfange Nachricht auf das Output Objekt
-        // Bei EOF wir das outputObjekt geschlossen
-
-        if(message.equals(EOT)) {
-            outputObject.shutdownOutput();
-        } else {
-            outputObject.printLine(message);
-        }
-
-    } */
-    // Änderung für den Transceiver -> EOT wird auf dem Output geschrieben und dann geschlossen.
     @Override
     public void onReceive(String message, Result<Actor<String>> sender) {
         if(!isTransceiver && message.equals(EOT)) {
             outputObject.shutdownOutput();
-        } if(!isTransceiver) {
-            outputObject.printLine(message);
         }
-
         if(isTransceiver && message.equals(EOT)) {
             outputObject.printLine(EOT);
             outputObject.shutdownOutput();
-
-        } if(isTransceiver) {
+        } else {
             outputObject.printLine(message);
-
         }
 
     }
@@ -65,9 +49,9 @@ public class Writer extends AbstractActor<String> {
     public void start(Result<Actor<String>> consumer) {
         reader.tell("", consumer);
     }
+
     public static Writer transceiver(Input in, Output out) {
-        isTransceiver = true;
-        return new Writer("Transceiver", Type.SERIAL, in, out);
+        return new Writer("Transceiver", Type.SERIAL, in, out, true);
     }
 
 }

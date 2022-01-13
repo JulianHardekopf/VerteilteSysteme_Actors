@@ -1,12 +1,8 @@
 package actor;
 
 import fpinjava.Callable;
-import fpinjava.Result;
 import inout.InputOutput;
 import inout.TCPReaderWriter;
-
-import java.net.ServerSocket;
-import java.net.Socket;
 
 public class ActorSystem {
 
@@ -41,7 +37,7 @@ public class ActorSystem {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                    new Writer("Slave", Actor.Type.SERIAL, slave ,slave).start(actor.self());
+                    new Writer("Slave", Actor.Type.SERIAL, slave ,slave, true).start(actor.self());
 
             }
         };

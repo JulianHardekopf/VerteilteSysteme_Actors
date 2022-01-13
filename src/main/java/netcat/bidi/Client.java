@@ -11,9 +11,9 @@ public class Client {
         if(args.length == 2) {
 
             Writer socketWriter = new Writer("socketWriter", Actor.Type.SERIAL, tcpReaderWriter,
-                    tcpReaderWriter);
+                    tcpReaderWriter, false);
             Writer consoleWriter = new Writer("consolewriter", Actor.Type.SERIAL,
-                    ConsoleReader.stdin(), ConsoleWriter.stdout());
+                    ConsoleReader.stdin(), ConsoleWriter.stdout(), false);
             socketWriter.start(Result.of(consoleWriter));
             consoleWriter.start(Result.of(socketWriter));
 

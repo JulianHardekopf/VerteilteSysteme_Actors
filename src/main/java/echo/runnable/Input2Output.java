@@ -12,7 +12,7 @@ public class Input2Output {
 
     public static void main(String[] args) throws InterruptedException {
        // input2output(ConsoleReader.stdin(),ConsoleWriter.stdout()).run();
-        input2output(new Writer("", Actor.Type.SERIAL, ConsoleReader.stdin(), ConsoleWriter.stdout())).run();
+        input2output(new Writer("", Actor.Type.SERIAL, ConsoleReader.stdin(), ConsoleWriter.stdout(), false)).run();
         sleep(10000);
     }
 

@@ -20,7 +20,7 @@ public  class Input2OutputTest {
 	public void test(String s) throws InterruptedException {
 		ScriptReader scriptReader = new ScriptReader(s);
 		ScriptWriter scriptWriter = new ScriptWriter();
-		Writer w = new Writer(s, Actor.Type.SERIAL, scriptReader, scriptWriter);
+		Writer w = new Writer(s, Actor.Type.SERIAL, scriptReader, scriptWriter, false);
 		// Input to Output mit den Writer als Runnable ausführen
 		w.start();
 		// Damit der MainThread nicht sofort terminiert

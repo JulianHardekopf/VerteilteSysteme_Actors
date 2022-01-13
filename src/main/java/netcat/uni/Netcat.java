@@ -24,12 +24,12 @@ public class Netcat {
         Actor<String> producer = null;
         if(args.length == 2) {
             Writer clientWriter = new Writer("netcatclient", Actor.Type.SERIAL, ConsoleReader.stdin(),
-                    TCPWriter.connectTo(args[0], Integer.parseInt(args[1])).call());
+                    TCPWriter.connectTo(args[0], Integer.parseInt(args[1])).call(), false);
             clientWriter.start();
 
         } if(args.length == 1) {
             Writer serverReader = new Writer("netcatserver", Actor.Type.SERIAL,
-                    TCPReader.accept(Integer.parseInt(args[0])).call(), ConsoleWriter.stdout());
+                    TCPReader.accept(Integer.parseInt(args[0])).call(), ConsoleWriter.stdout(), false);
             serverReader.start();
 
         }

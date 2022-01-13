@@ -10,7 +10,7 @@ public class Client {
     public static void main(String[] args) throws Exception {
 
         actor.Writer clientWriter = new Writer("netcatclient", Actor.Type.SERIAL, ConsoleReader.stdin(),
-                TCPWriter.connectTo(args[0], Integer.parseInt(args[1])).call());
+                TCPWriter.connectTo(args[0], Integer.parseInt(args[1])).call(), false);
         clientWriter.start();
     }
 }

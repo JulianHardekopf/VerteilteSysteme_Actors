@@ -14,10 +14,10 @@ public class Server {
         InputOutput tcpReaderWriter =  TCPReaderWriter.accept(Integer.parseInt(args[0])).call();
         if(args.length == 1) {
             Writer socketWriter = new Writer("socketWriter", Actor.Type.SERIAL,
-                    tcpReaderWriter, tcpReaderWriter);
+                    tcpReaderWriter, tcpReaderWriter, false);
 
             Writer consoleWriter = new Writer("sever", Actor.Type.SERIAL,
-                    ConsoleReader.stdin(), ConsoleWriter.stdout());
+                    ConsoleReader.stdin(), ConsoleWriter.stdout(), false);
             socketWriter.start(Result.of(consoleWriter));
             consoleWriter.start(Result.of(socketWriter));
 
