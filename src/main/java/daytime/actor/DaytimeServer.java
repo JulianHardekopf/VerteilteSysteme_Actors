@@ -9,7 +9,7 @@ import inout.ConsoleReader;
 public class DaytimeServer {
     public static void main(String[] args) throws Exception {
         DaytimeActor<String> daytimeActor = new DaytimeActor<>("dayTimeActor", Actor.Type.SERIAL);
-        ActorSystem.publish2one(daytimeActor, Integer.parseInt(args[0])).run();
+        ActorSystem.publish2multiple(daytimeActor, Integer.parseInt(args[0])).run();
 
 
     }
